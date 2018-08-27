@@ -31,7 +31,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
   @Override
-  public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+  public void configure(ResourceServerSecurityConfigurer resources) {
     // nothing to configure
   }
 

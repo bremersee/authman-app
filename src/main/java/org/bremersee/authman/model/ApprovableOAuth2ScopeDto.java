@@ -54,6 +54,7 @@ public class ApprovableOAuth2ScopeDto implements Serializable,
   @ApiModelProperty(value = "Is the scope approved?")
   private boolean approved;
 
+  @SuppressWarnings("NullableProblems")
   @Override
   public int compareTo(final ApprovableOAuth2ScopeDto other) {
     final String s0 = scope == null ? "" : scope;

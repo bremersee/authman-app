@@ -69,6 +69,7 @@ public class SelectOptionDto implements Serializable, Comparable<SelectOptionDto
   @JsonProperty(value = "selected", defaultValue = "false")
   private boolean selected;
 
+  @SuppressWarnings("NullableProblems")
   @Override
   public int compareTo(SelectOptionDto selectOptionDto) {
     String s0 = this.displayValue == null ? "" : this.displayValue;
