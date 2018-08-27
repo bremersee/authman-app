@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+  <title th:text="#{authorize.title}">Authorize</title>
+  <link rel="stylesheet" href="../static/lib/bootstrap/4.0.0/css/bootstrap.min.css"
+        th:href="@{/lib/bootstrap/4.0.0/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" href="../static/lib/bootstrap-social/5.1.1/bootstrap-social.css"
+        th:href="@{/lib/bootstrap-social/5.1.1/bootstrap-social.css}"/>
+  <link rel="stylesheet" href="../static/lib/font-awesome/4.7.0/css/font-awesome.css"
+        th:href="@{/lib/font-awesome/4.7.0/css/font-awesome.css}"/>
+  <link rel="stylesheet" href="../static/css/app.css"
+        th:href="@{/css/app.css}"/>
+  <script src="../static/lib/jquery/3.2.1/jquery.min.js"
+          th:src="@{/lib/jquery/3.2.1/jquery.min.js}"></script>
+  <script src="../static/lib/popper/1.12.9/popper.js"
+          th:src="@{/lib/popper/1.12.9/popper.js}"></script>
+  <script src="../static/lib/bootstrap/4.0.0/js/bootstrap.min.js"
+          th:src="@{/lib/bootstrap/4.0.0/js/bootstrap.min.js}"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top"
+     th:replace="fragments/header :: header">
+  <a class="navbar-brand" href="#">bremersee.org</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse"
+          data-target="#mainNavbar"
+          aria-controls="mainNavbar" aria-expanded="false"
+          aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="mainNavbar">
+  </div>
+</nav>
+
+<main role="main" class="container">
+
+  <div class="inner-container">
+    <form id="confirmationForm" name="confirmationForm"
+          th:action="@{'../oauth/authorize'}" method="post">
+      <input type="hidden" id="csrf_token"
+             th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+      <input name="user_oauth_approval" value="true" type="hidden"/>
+      <div class="info-container">
+        <span th:text="#{controller.authorize.scopes.question(${clientDisplayName})}">
+          The application LogLatLong would like to do the following things. Do you agree?
+        </span>
+      </div>
+
+      <div class="form-check py-3" th:each="ascope : ${approvableScopes}">
+        <input type="checkbox" class="form-check-input"
+               th:id="'scope.' + ${ascope.scope}"
+               th:name="'scope.' + ${ascope.scope}"
+               th:checked="${ascope.approved}"
+               value="true"/>
+        <!--+ The value of the checkbox must be true,
+            | because the value is only submitted when the box is checked.
+            | If there's no value attribute, 'on' instead of 'true' will be submitted.
+            +-->
+        <label class="form-check-label" th:attr="for='scope.' + ${ascope.scope}"
+               th:text="${ascope.scope}">
+          email.read
+        </label>
+        <small class="form-text text-muted" th:text="${ascope.description}">
+          Read your email address and stuff related to it.
+        </small>
+      </div>
+      <div class="form-check py-3" th:if="${0 == 1}">
+        <input type="checkbox" class="form-check-input"
+               id="ignored"
+               name="ignored"
+               value="true"/>
+        <label class="form-check-label" for="ignored">
+          email.write
+        </label>
+        <small class="form-text text-muted">
+          Change your email address and stuff related to it.
+        </small>
+      </div>
+
+      <button type="submit"
+              class="btn btn-primary"
+              title="Authorize the selected scopes"
+              th:title="#{controller.authorize.submit.title}"
+              th:text="#{label.submit}">
+        Submit
+      </button>
+    </form>
+  </div>
+</main>
+</body>
+</html>

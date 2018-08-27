@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+  <title th:text="#{oauth2.scope.edit.title}">Edit OAuth2 Scope</title>
+  <link rel="stylesheet" href="../../static/lib/bootstrap/4.0.0/css/bootstrap.min.css"
+        th:href="@{'/lib/bootstrap/4.0.0/css/bootstrap.min.css'}"/>
+  <link rel="stylesheet" href="../../static/lib/bootstrap-social/5.1.1/bootstrap-social.css"
+        th:href="@{'/lib/bootstrap-social/5.1.1/bootstrap-social.css'}"/>
+  <link rel="stylesheet" href="../../static/lib/font-awesome/4.7.0/css/font-awesome.css"
+        th:href="@{'/lib/font-awesome/4.7.0/css/font-awesome.css'}"/>
+  <link rel="stylesheet" href="../../static/css/app.css"
+        th:href="@{'/css/app.css'}"/>
+  <link rel="stylesheet" href="../../static/css/glyphicons.css"
+        th:href="@{'/css/glyphicons.css'}"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top"
+     th:replace="fragments/header :: header">
+  <a class="navbar-brand" href="#">bremersee.org</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse"
+          data-target="#mainNavbar"
+          aria-controls="mainNavbar" aria-expanded="false"
+          aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="mainNavbar">
+  </div>
+</nav>
+
+<main role="main" class="container">
+  <div class="inner-container">
+    <div class="pb-3">
+      <h3 th:text="#{oauth2.scope.edit.header}">Edit OAuth2 Scope</h3>
+    </div>
+
+    <div>
+      <form th:action="@{edit-scope}" th:object="${scope}" action="#" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <div th:if="not *{editable}"
+             class="alert alert-info" role="alert"
+             th:text="#{oauth2.scope.not.editable}">
+          The scope is not editable, because you are not the owner of this scope.
+        </div>
+
+        <div class="form-group">
+          <label for="scope" th:text="#{oauth2.scope.name}">Name</label>
+          <input type="text" class="form-control"
+                 id="scope" name="scope"
+                 readonly
+                 th:field="*{scope}" />
+        </div>
+
+        <div class="form-group">
+          <label for="visibility" th:text="#{oauth2.scope.visibility}">Visibility</label>
+          <select class="form-control"
+                  id="visibility" name="visibility"
+                  required
+                  th:field="*{visibility}">
+            <option class="language-option" th:if="${1 == 0}">PUBLIC</option>
+            <option class="language-option" th:if="${1 == 0}">PRIVATE</option>
+            <option class="language-option" th:each="option : ${visibilities}"
+                    th:value="${option.value}"
+                    th:text="${option.displayValue}">
+              ADMIN
+            </option>
+          </select>
+        </div>
+
+        <div class="row">
+          <div class="col col-sm-3">
+            <div class="form-group">
+              <label for="defaultLanguage" th:text="#{oauth2.scope.description.default.language}">
+                Language of the description
+              </label>
+              <select class="form-control"
+                      id="defaultLanguage" name="defaultLanguage"
+                      required
+                      th:readonly="not *{editable}"
+                      th:field="*{defaultLanguage}">
+                <option class="language-option" th:if="${1 == 0}">deutsch</option>
+                <option class="language-option" th:if="${1 == 0}">englisch</option>
+                <option class="language-option" th:each="option : ${languages}"
+                        th:value="${option.value}"
+                        th:text="${option.displayValue}">
+                  französisch
+                </option>
+              </select>
+              <small id="defaultLanguageHelp" class="form-text text-muted"
+                     th:text="#{oauth2.scope.description.default.language.help}">
+                Please select the language of the description.
+              </small>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label for="defaultDescription" th:text="#{oauth2.scope.description.default}">
+                Description
+              </label>
+              <input type="text" class="form-control"
+                     id="defaultDescription" name="defaultDescription"
+                     required
+                     pattern="^.{3,64000}$"
+                     th:pattern="${scopeDescriptionPattern}"
+                     th:readonly="not *{editable}"
+                     th:field="*{defaultDescription}" />
+              <small id="defaultDescriptionHelp" class="form-text text-muted"
+                     th:class="${#fields.hasErrors('defaultDescription')} ? 'invalid-feedback' : 'form-text text-muted'"
+                     th:text="#{oauth2.scope.description.default.help}">
+                Please enter a short description of the scope.
+              </small>
+              <div class="invalid-feedback"
+                   th:text="${#fields.hasErrors('defaultDescription')} ? ${#fields.errors('defaultDescription')[0]} : ''">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="additional-scope-descriptions">
+          <div class="row" th:each="description,iter : *{descriptions}">
+            <div class="col col-sm-3">
+              <div class="form-group">
+                <select class="form-control language-selector"
+                        name="language-0"
+                        th:name="'language-' + ${iter.index}"
+                        th:readonly="not *{editable}">
+                  <option th:if="${1 == 0}">deutsch</option>
+                  <option th:if="${1 == 0}">englisch</option>
+                  <option th:each="option : ${languages}"
+                          th:value="${option.value}"
+                          th:text="${option.displayValue}"
+                          th:selected="${description.language} == ${option.value}">
+                    französisch
+                  </option>
+                </select>
+                <small class="form-text text-muted"
+                       th:text="#{oauth2.scope.description.another.language}">
+                  Please select another language.
+                </small>
+              </div>
+            </div>
+            <div class="col">
+              <div class="inner-addon right-addon">
+                <i class="remover glyphicon glyphicon-remove-sign" title="Remove"
+                   th:if="*{editable}"
+                   th:title="#{oauth2.scope.description.remove}"></i>
+                <input type="text" class="form-control"
+                       th:name="'description-' + ${iter.index}"
+                       th:readonly="not *{editable}"
+                       th:value="${description.description}" />
+              </div>
+              <small class="form-text text-muted"
+                     th:text="#{oauth2.scope.description.another}">
+                Please enter the description in the other language.
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <small th:if="*{editable}" class="form-text text-muted">
+            <a id="add-description-link" href="#" style="text-decoration: none">
+              <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+              <span class="pl-1" th:text="#{oauth2.scope.description.add}">
+                Add a description in another language.
+              </span>
+            </a>
+          </small>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3"
+                th:disabled="not *{editable}"
+                th:text="#{oauth2.client.update}">
+          Update
+        </button>
+        <a href="clients.html" th:href="@{/developer/scopes}"
+           class="btn btn-secondary ml-3 mt-3" role="button"
+           th:text="#{oauth2.client.cancel}">
+          Cancel
+        </a>
+      </form>
+    </div>
+  </div>
+</main>
+</body>
+<script src="../../static/lib/jquery/3.2.1/jquery.min.js"
+        th:src="@{/lib/jquery/3.2.1/jquery.min.js}"></script>
+<script src="../../static/lib/popper/1.12.9/popper.js"
+        th:src="@{/lib/popper/1.12.9/popper.js}"></script>
+<script src="../../static/lib/bootstrap/4.0.0/js/bootstrap.min.js"
+        th:src="@{/lib/bootstrap/4.0.0/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+  //<![CDATA[
+  'use strict';
+  $(function () {
+    var langText = /*[[#{oauth2.scope.description.another.language}]]*/ 'Please select another language.';
+    var descrText = /*[[#{oauth2.scope.description.another}]]*/ 'Please enter the description in the other language.';
+    var removeText = /*[[#{oauth2.scope.description.remove}]]*/ 'Remove';
+    var preferredLanguage = /*[[${preferredLanguage}]]*/ 'de';
+
+    var removeDescription = function (event) {
+      event.preventDefault();
+      $(event.target).parent().parent().parent().remove();
+    };
+
+    $('.remover').click(function (event) {
+      removeDescription(event)
+    });
+
+    $('#add-description-link').click(function (event) {
+      event.preventDefault();
+      var languageSelectors = $('.language-selector');
+      var nextNo = 0;
+      if (languageSelectors.length > 0) {
+        nextNo = Number(languageSelectors.last().attr('name').substring('language-'.length)) + 1;
+      }
+
+      var row = $("<div class='row'></div>");
+      var colLang = $("<div class='col col-sm-3'></div>");
+      var formGroupLang = $("<div class='form-group'></div>");
+      var selectLang = $("<select class='form-control language-selector' name='language-" + nextNo + "'></select>");
+      $('.language-option').each(function () {
+        selectLang.append($(this).clone());
+      });
+      var helpLang = $("<small class='form-text text-muted'>" + langText + "</small>");
+      formGroupLang.append(selectLang, helpLang);
+      colLang.append(formGroupLang);
+      row.append(colLang);
+
+      var colDescr = $("<div class='col'></div>");
+      var removeDescr = $("<div class='inner-addon right-addon'></div>");
+      var removeIcon = $("<i class='remover glyphicon glyphicon-remove-sign' title='" + removeText + "'></i>");
+      removeIcon.click(function (event) {
+        removeDescription(event);
+      });
+      removeDescr.append(removeIcon);
+      var inputDescr = $("<input type='text' class='form-control' name='description-" + nextNo + "' value='' />");
+      removeDescr.append(inputDescr);
+      var helpDescr = $("<small class='form-text text-muted'>" + descrText + "</small>");
+      colDescr.append(removeDescr, helpDescr);
+      row.append(colDescr);
+      $('#additional-scope-descriptions').append(row);
+    });
+
+  });
+  //]]>
+</script>
+</html>

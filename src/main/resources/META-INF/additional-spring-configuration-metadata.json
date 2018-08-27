@@ -1,0 +1,46 @@
+{
+  "properties": [
+    {
+      "name": "bremersee.startup.admin.user-name",
+      "type": "java.lang.String",
+      "description": "The user name of the administrator.",
+      "defaultValue": "admin"
+    },
+    {
+      "name": "bremersee.startup.admin.password",
+      "type": "java.lang.String",
+      "description": "The password of the administrator. Please change it after the first start.",
+      "defaultValue": "secret4ADMIN"
+    },
+    {
+      "name": "bremersee.startup.admin.display-name",
+      "type": "java.lang.String",
+      "description": "The first and last name of the administrator.",
+      "defaultValue": "Adam Admin"
+    },
+    {
+      "name": "bremersee.startup.admin.email",
+      "type": "java.lang.String",
+      "description": "The email address of the administrator.",
+      "defaultValue": "admin@bremersee.org"
+    },
+    {
+      "name": "bremersee.startup.admin.preferred-locale",
+      "type": "java.lang.String",
+      "description": "The preferred locale of the administrator.",
+      "defaultValue": "de_DE"
+    },
+    {
+      "name": "bremersee.startup.admin.preferred-time-zone-id",
+      "type": "java.lang.String",
+      "description": "The preferred time zone of the administrator.",
+      "defaultValue": "Europe/Berlin"
+    },
+    {
+      "name": "bremersee.user-service.min-search-length",
+      "type": "java.lang.Integer",
+      "description": "The minimum length of a search string.",
+      "defaultValue": 3
+    }
+  ]
+}

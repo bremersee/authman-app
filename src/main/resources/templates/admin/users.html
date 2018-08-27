@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<!--suppress XmlUnusedNamespaceDeclaration -->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+  <title th:text="#{i18n.users}">Users</title>
+  <link rel="stylesheet" href="../../static/lib/bootstrap/4.0.0/css/bootstrap.min.css"
+        th:href="@{/lib/bootstrap/4.0.0/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" href="../../static/lib/bootstrap-social/5.1.1/bootstrap-social.css"
+        th:href="@{/lib/bootstrap-social/5.1.1/bootstrap-social.css}"/>
+  <link rel="stylesheet" href="../../static/lib/font-awesome/4.7.0/css/font-awesome.css"
+        th:href="@{/lib/font-awesome/4.7.0/css/font-awesome.css}"/>
+  <link rel="stylesheet" href="../../static/css/app.css"
+        th:href="@{/css/app.css}"/>
+  <link rel="stylesheet" href="../../static/css/glyphicons.css"
+        th:href="@{/css/glyphicons.css}"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top"
+     th:replace="fragments/header :: header">
+  <a class="navbar-brand" href="#">bremersee.org</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse"
+          data-target="#mainNavbar"
+          aria-controls="mainNavbar" aria-expanded="false"
+          aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="mainNavbar">
+  </div>
+</nav>
+
+<main role="main" class="container">
+  <div class="inner-container">
+    <div class="pb-3">
+      <h3 th:text="#{i18n.users}">Users</h3>
+    </div>
+
+    <!--suppress ThymeleafVariablesResolveInspection -->
+    <div th:if="${rmsg != null}"
+         class="alert alert-success"
+         th:class="${rmsg != null} ? ${rmsg.msgType.cssClass} : ''" role="alert"
+         th:text="${rmsg != null} ? ${rmsg.msg} : ''">
+      Status message
+    </div>
+
+    <div th:if="${#lists.isEmpty(userPage.content)}"
+         class="alert alert-info" role="alert"
+         th:text="#{i18n.users.empty}">
+      There are no users.
+    </div>
+
+    <div th:if="${not #lists.isEmpty(userPage.content)}">
+      <table class="table">
+        <thead>
+        <tr>
+          <th th:text="#{i18n.name}">Name</th>
+          <th th:text="#{i18n.user.name}">User Name</th>
+          <th th:text="#{i18n.email.address}">Email Address</th>
+          <th th:text="#{i18n.creation.date}">Creation Date</th>
+          <th th:text="#{i18n.enabled}">Enabled</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${userPage.content}">
+          <td th:text="${entry.displayName}">Anna Livia Plurabelle</td>
+          <td th:text="${entry.userName}">anna</td>
+          <td th:text="${entry.email}">anna@example.org</td>
+          <td th:text="${#dates.format(entry.created, 'dd.MM.yyyy')}">01.04.2015</td>
+          <td>
+            <span class="glyphicon glyphicon-ban-circle text-danger"
+                  th:class="${entry.enabled} ? 'glyphicon glyphicon-ok-circle text-success' : 'glyphicon glyphicon-ban-circle text-danger'"
+                  aria-hidden="true"></span>
+          </td>
+          <td style="text-align: right">
+            <a href="#" th:href="@{/admin/edit-user(user=${entry.userName})}"
+               title="Edit"
+               th:title="#{i18n.edit}">
+              <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+            </a>
+            <a href="#" th:href="@{/admin/change-password(user=${entry.userName})}"
+               class="ml-3"
+               title="Change password"
+               th:title="#{i18n.change.password}">
+              <span class="fa fa-lock" aria-hidden="true"></span>
+            </a>
+            <a href="#"
+               class="deleter ml-3"
+               th:id="'delete-' + ${entry.id}"
+               title="Delete"
+               th:title="#{i18n.delete}">
+              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </a>
+            <form th:id="'delete-' + ${entry.id} + '-form'"
+                  th:action="@{users(user=${entry.userName})}" action="#" method="post">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+</body>
+<script src="../../static/lib/jquery/3.2.1/jquery.min.js"
+        th:src="@{/lib/jquery/3.2.1/jquery.min.js}"></script>
+<script src="../../static/lib/popper/1.12.9/popper.js"
+        th:src="@{/lib/popper/1.12.9/popper.js}"></script>
+<script src="../../static/lib/bootstrap/4.0.0/js/bootstrap.min.js"
+        th:src="@{/lib/bootstrap/4.0.0/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+  //<![CDATA[
+  'use strict';
+  $(function () {
+    var deleteQuestion = /*[[#{i18n.user.delete.confirm}]]*/ 'Do you really want to delete this user?';
+
+    var deleteUser = function (id) {
+      var answer = confirm(deleteQuestion);
+      if (answer) {
+        $('#delete-' + id + '-form').submit();
+      }
+    };
+
+    $('.deleter').click(function (event) {
+      event.preventDefault();
+      var id = $(event.target).parent().attr('id').substring('delete-'.length);
+      deleteUser(id);
+    });
+
+  });
+  //]]>
+</script>
+</html>

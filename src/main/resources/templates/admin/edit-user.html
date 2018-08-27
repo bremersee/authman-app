@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<!--suppress XmlUnusedNamespaceDeclaration -->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+  <title th:text="#{i18n.user.edit}">Edit User</title>
+  <link rel="stylesheet" href="../../static/lib/bootstrap/4.0.0/css/bootstrap.min.css"
+        th:href="@{/lib/bootstrap/4.0.0/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" href="../../static/lib/bootstrap-social/5.1.1/bootstrap-social.css"
+        th:href="@{/lib/bootstrap-social/5.1.1/bootstrap-social.css}"/>
+  <link rel="stylesheet" href="../../static/lib/font-awesome/4.7.0/css/font-awesome.css"
+        th:href="@{/lib/font-awesome/4.7.0/css/font-awesome.css}"/>
+  <link rel="stylesheet" href="../../static/css/app.css"
+        th:href="@{/css/app.css}"/>
+  <link rel="stylesheet" href="../../static/css/glyphicons.css"
+        th:href="@{/css/glyphicons.css}"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top"
+     th:replace="fragments/header :: header">
+  <a class="navbar-brand" href="#">bremersee.org</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse"
+          data-target="#mainNavbar"
+          aria-controls="mainNavbar" aria-expanded="false"
+          aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="mainNavbar">
+  </div>
+</nav>
+
+<main role="main" class="container">
+  <div class="inner-container">
+    <div class="pb-3">
+      <h3 th:text="#{i18n.user.edit}">Edit User</h3>
+    </div>
+
+    <div>
+      <form th:action="@{edit-user}" th:object="${user}" action="#" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <div class="form-group">
+          <label for="userName" th:text="#{i18n.user.name}">User name</label>
+          <input type="text" class="form-control"
+                 id="userName" name="userName"
+                 readonly
+                 th:field="*{userName}"/>
+        </div>
+
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="enabled"  name="enabled"
+                 th:field="*{enabled}" />
+          <label class="form-check-label" for="enabled" th:text="#{i18n.enabled}">
+            Enabled
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="displayName" th:text="#{i18n.user.display.name}">
+            First and last name
+          </label>
+          <input type="text" class="form-control"
+                 id="displayName" name="displayName"
+                 placeholder="Anna Livia Plurabelle"
+                 th:field="*{displayName}"/>
+          <small id="displayNameHelp" class="form-text text-muted"
+                 th:text="#{i18n.user.display.name.admin.help}">
+            Please enter the first and last name of the user.
+          </small>
+          <div class="invalid-feedback"
+               th:text="${#fields.hasErrors('displayName')} ? ${#fields.errors('displayName')[0]} : ''">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="preferredLocale" th:text="#{i18n.preferred.locale}">
+            Preferred locale
+          </label>
+          <select class="form-control"
+                  id="preferredLocale" name="preferredLocale"
+                  th:field="*{preferredLocale}">
+            <option th:if="${1 == 0}">Deutschland (deutsch)</option>
+            <option th:if="${1 == 0}">Amerika (englisch)</option>
+            <option th:each="option : ${locales}"
+                    th:value="${option.value}"
+                    th:text="${option.displayValue}">Frankreich (französisch)
+            </option>
+          </select>
+          <small id="preferredLocaleHelp" class="form-text text-muted"
+                 th:text="#{i18n.preferred.locale.admin.help}">
+            Please select the locale of the user.
+          </small>
+          <div class="invalid-feedback"
+               th:text="${#fields.hasErrors('preferredLocale')} ? ${#fields.errors('preferredLocale')[0]} : ''">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="preferredTimeZone" th:text="#{i18n.preferred.time.zone}">
+            Preferred time zone
+          </label>
+          <select class="form-control"
+                  id="preferredTimeZone" name="preferredTimeZone"
+                  th:field="*{preferredTimeZoneId}">
+            <option th:if="${1 == 0}">Europe/Berlin</option>
+            <option th:each="option : ${zones}"
+                    th:value="${option.value}"
+                    th:text="${option.displayValue}">GMT
+            </option>
+          </select>
+          <small id="preferredTimeZoneHelp" class="form-text text-muted"
+                 th:text="#{i18n.preferred.time.zone.admin.help}">
+            Please choose the time zone of the user.
+          </small>
+          <div class="invalid-feedback"
+               th:text="${#fields.hasErrors('preferredTimeZoneId')} ? ${#fields.errors('preferredTimeZoneId')[0]} : ''">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email" th:text="#{i18n.email.address}">Email Address</label>
+          <input type="email" class="form-control"
+                 th:class="${#fields.hasErrors('email')} ? 'form-control is-invalid' : 'form-control'"
+                 id="email" name="email"
+                 placeholder="anna@bremersee.org"
+                 th:field="*{email}"/>
+          <small id="emailHelp" class="form-text text-muted"
+                 th:class="${#fields.hasErrors('email')} ? 'invalid-feedback' : 'form-text text-muted'"
+                 th:text="#{i18n.email.address.admin.help}">
+            Please enter the email address of the user.
+          </small>
+          <div class="invalid-feedback"
+               th:text="${#fields.hasErrors('email')} ? ${#fields.errors('email')[0]} : ''">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="mobile" th:text="#{i18n.mobile}">
+            Mobile number
+          </label>
+          <input id="mobile" name="mobile" class="form-control" type="text"
+                 th:class="${#fields.hasErrors('mobile')} ? 'form-control is-invalid' : 'form-control'"
+                 th:field="*{mobile}"
+                 pattern="^0049\d{5,15}$"
+                 th:pattern="${mobilePattern}"/>
+          <small id="mobileHelp" class="form-text text-muted"
+                 th:class="${#fields.hasErrors('mobile')} ? 'invalid-feedback' : 'form-text text-muted'"
+                 th:text="#{i18n.mobile.admin.help}">
+            Please enter the mobile number in international format, for example
+            '0049151580xyznm'. Please understand that we only accept German numbers.
+          </small>
+          <div class="invalid-feedback"
+               th:text="${#fields.hasErrors('mobile')} ? ${#fields.errors('mobile')[0]} : ''">
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <div class="card-title" th:text="#{i18n.connected.accounts}">Connected accounts</div>
+            <div class="form-check">
+              <input id="github" type="checkbox" class="form-check-input" disabled th:checked="${gitHubConnected}" />
+              <label for="github"><i class="fa fa-github left"></i> GitHub</label>
+            </div>
+            <div class="form-check">
+              <input id="google" type="checkbox" class="form-check-input" disabled th:checked="${googleConnected}" />
+              <label for="google"><i class="fa fa-google left"></i> Google</label>
+            </div>
+            <div class="form-check">
+              <input id="facebook" type="checkbox" class="form-check-input" disabled th:checked="${facebookConnected}" />
+              <label for="facebook"><i class="fa fa-facebook left"></i> Facebook</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <div class="card-title" th:text="#{i18n.roles}">Roles</div>
+            <div class="form-check" th:each="role,iter : ${roles}">
+              <!--suppress HtmlFormInputWithoutLabel -->
+              <input th:id="'role-' + ${iter.index}" name="roles"
+                     type="checkbox" class="form-check-input"
+                     th:field="*{roles}"
+                     th:value="${role.value}" th:checked="${role.selected}" />
+              <label th:for="'role-' + ${iter.index}" th:text="${role.displayValue}"></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <div class="card-body">
+            <div class="card-title" th:text="#{i18n.samba.account}">Samba Account</div>
+            <div class="form-check">
+              <input class="form-check-input" id="sambaActivated" name="sambaActivated"
+                     type="checkbox" th:field="*{sambaActivated}"/>
+              <label id="sambaActivatedLabel" for="sambaActivated" th:text="#{i18n.enabled}">
+                Enabled
+              </label>
+            </div>
+            <div id="sambaGroups">
+              <div class="card-title mt-2" th:text="#{i18n.samba.groups}">Samba Groups</div>
+              <div class="form-check" th:each="group,iter : ${sambaGroups}">
+                <!--suppress HtmlFormInputWithoutLabel -->
+                <input th:id="'samba-group-' + ${iter.index}" name="sambaSettings.sambaGroups"
+                       type="checkbox" class="form-check-input"
+                       th:value="${group.value}" th:checked="${group.selected}"/>
+                <label th:for="'samba-group-' + ${iter.index}" th:text="${group.displayValue}">
+                  A samba group
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3"
+                th:text="#{i18n.update}">
+          Update
+        </button>
+        <a href="users.html" th:href="@{/admin/users}"
+           class="btn btn-secondary ml-3 mt-3" role="button"
+           th:text="#{i18n.cancel}">
+          Cancel
+        </a>
+      </form>
+    </div>
+  </div>
+</main>
+</body>
+<script src="../../static/lib/jquery/3.2.1/jquery.min.js"
+        th:src="@{/lib/jquery/3.2.1/jquery.min.js}"></script>
+<script src="../../static/lib/popper/1.12.9/popper.js"
+        th:src="@{/lib/popper/1.12.9/popper.js}"></script>
+<script src="../../static/lib/bootstrap/4.0.0/js/bootstrap.min.js"
+        th:src="@{/lib/bootstrap/4.0.0/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+  //<![CDATA[
+  'use strict';
+  $(function () {
+    var sambaActivated = $('#sambaActivated');
+
+    var displaySambaGroups = function () {
+      var sambaGroups = $('#sambaGroups');
+      if (sambaActivated.is(':checked')) {
+        sambaGroups.css('display', 'inline');
+      } else {
+        sambaGroups.css('display', 'none');
+      }
+    };
+    displaySambaGroups();
+    sambaActivated.click(function () {
+      displaySambaGroups();
+    });
+
+  });
+  //]]>
+</script>
+</html>

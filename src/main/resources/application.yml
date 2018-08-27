@@ -1,0 +1,281 @@
+bremersee:
+  access:
+    authorities:
+      - ROLE_ACTUATOR
+    ip-addresses:
+      - 127.0.0.1
+  authorization-server:
+    allow-form-authentication-for-clients: false
+    check-token-access: isAuthenticated()
+    handle-approval-revocations-as-expiry: false
+    jwt-signing-key: |
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEogIBAAKCAQEAthqh5Zo/B0D3ug7WILthKnluhbivMlVFM4eRnSPh+yvbSqJp
+      JwGqnpxD8VzWod8UF+L9aqRUNc2KgAY957LLoRwac2DVQaaFVZViqdyrOO9MuYcE
+      3pGQ5eY3hPso0uohuVYKffWDDAqP1EKiKe9DDTWR6xGYxhPH42hxCfinvP6HfSaw
+      wq/wrFlu7SH9as+ew1jJmeNnj5oeNlE9IQ+t9hYlXPcW+XALGDbVLrwxHXq95V0Z
+      TrI+R1KWFH08jwO2oik4jI3sHK877aa+YEdXJee3wSCBin0NBUooGJDRQgYQ+eZB
+      4LtSUd53jHXSKj9ng9AY+ep/AVzAXjd0wU7eSwIDAQABAoIBAC14m/l1mQxqJBGA
+      9+XndB1Dgh4A3jpewW9bCDipR5nMuy65PDGBwIVndq2zpWJ5Dg7i3q18yAxBPTa3
+      mEidRCyAFHi/8rA4cO3MZf0NPXHziwB+nvAmf/xwDmf1wR1dWjtpqSgHoIfmsUBq
+      vQxkkqUfPcbpN3Eqaky1/Rfkz5motmLHV+onahNxrlwgrNZo65LSybxSZCcx+8o7
+      GzTRP5+rf/4nJx7tpP4+1Tg2zI+ieLAPHPebrZQVbRxtBz0nsKjWMA32ntIyumBZ
+      aR78jZxks3wGM0eczFNKs6DEBTOP06JVbGKRkmUwe7al6+ZWjNXDJ7uBTyjGrkth
+      VpFc8ZECgYEA8CguJCM1lxd3GG88AhMjliflijl3H8dFK0puz3KaxAXhWDTxMBEo
+      NRVOa14Favkbv5CIfYsGdpV0RZJBHQDo2vAqJwuR8F+GIS3xYmOnAbN9lIXwrQyC
+      5YH1z0EgcWYGcZVpjCvFYG6rr/cA04rCWhkgv9sPgo4IH2t6VEL+E9sCgYEAwh4K
+      5XCMvEOEhLC9VRitzzb9MSunsfxYP/yB6IYw022siPykGgOHE5gckdi5I8MpPqpP
+      cxZkZzNrxNREj3d4PuQc8wsZXY2wca/jZCGE4LEN+aOc6ILTUe3ktSWxn98sekaJ
+      Wq9CYVIbDr6c/p5y76Rc9goGeQrzdw+7bi8uolECgYB1xY6TJD0kolpCPlJ0RgR+
+      n4Qem/3CNMvD5hWfX/lrxeJzikr5IoDQP2mcl5galJ05/VwiDOqXfsVtVMLfwVFw
+      BLT3PuJLudyiKtCkSnBdEjO0gVa81lTezjPIdoy9b6YbT4VaOyDpIHzLp1rdYr/a
+      xVXdIEVj5dkv51ovNkc5XwKBgDhapGsrm4/kQgqLjMuxmHP50NN/ivWe/rfExKoO
+      mwomYtp6DeIHeCV2GYU117nMJKMuqlYNACT9xqGjxiuoUV5gtw7QABMq2TiICYm+
+      OWdJv3bjyt+ta0/zslvsj36MOctdwu5yxuCeB4DmUYmR0mhD3UEIdAyb40aDaLR6
+      Oh2hAoGAKWsYRJ+08ww1H3d/DrRwrAWuF24lLQZ4uFfPwPGzS68j3HeVHYEf+mbj
+      JUVRzMKqA46+mQYaj8JNoK9qgBmRxPNZYmzmcY9lGW4/QqDnHPICxCsmyGI/GZy8
+      pg0uvTQiDY+a4dygdAK4t1Ne6I/YnrG+pxkVoioQw+FQCK+qoKM=
+      -----END RSA PRIVATE KEY-----
+    jwt-verifier-key: |
+      -----BEGIN PUBLIC KEY-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAthqh5Zo/B0D3ug7WILth
+      KnluhbivMlVFM4eRnSPh+yvbSqJpJwGqnpxD8VzWod8UF+L9aqRUNc2KgAY957LL
+      oRwac2DVQaaFVZViqdyrOO9MuYcE3pGQ5eY3hPso0uohuVYKffWDDAqP1EKiKe9D
+      DTWR6xGYxhPH42hxCfinvP6HfSawwq/wrFlu7SH9as+ew1jJmeNnj5oeNlE9IQ+t
+      9hYlXPcW+XALGDbVLrwxHXq95V0ZTrI+R1KWFH08jwO2oik4jI3sHK877aa+YEdX
+      Jee3wSCBin0NBUooGJDRQgYQ+eZB4LtSUd53jHXSKj9ng9AY+ep/AVzAXjd0wU7e
+      SwIDAQAB
+      -----END PUBLIC KEY-----
+    no-scope-description-available: Sorry, there's no description of this scope.
+    realm: ${REALM:oauth2/client}
+    ssl-only: false
+    token-key-access: permitAll()
+  oauth2:
+    facebook:
+      provider: facebook
+      login-url-template: "\
+        https://www.facebook.com/v2.8/dialog/oauth\
+        ?client_id={clientId}\
+        &redirect_uri={redirectUri}\
+        &response_type={responseType}\
+        &scope={scope}\
+        &state={state}"
+      client-id: ${FACEBOOK_CLIENT_ID:changeit}
+      client-secret: ${FACEBOOK_CLIENT_SECRET:changeit}
+      redirect-uri: http://localhost:8080/facebook/callback
+      redirect-uri-profile-connect: http://localhost:8080/profile/facebook/callback
+      response-type: code
+      scope: public_profile,email
+      token-url-template: "\
+        https://graph.facebook.com/v2.8/oauth/access_token\
+        ?client_id={clientId}\
+        &redirect_uri={redirectUri}\
+        &client_secret={clientSecret}\
+        &code={code}"
+      api-base-url: https://graph.facebook.com/v2.8
+      profile-path-template: "/me?access_token={accessToken}\
+        &fields=id,name,gender,first_name,middle_name,last_name,name_format,email,locale,timezone,verified,website"
+    github:
+      provider: github
+      login-url-template: "\
+        https://github.com/login/oauth/authorize\
+        ?client_id={clientId}\
+        &redirect_uri={redirectUri}\
+        &scope={scope}\
+        &state={state}"
+      client-id: ${GITHUB_CLIENT_ID:changeit}
+      client-secret: ${GITHUB_CLIENT_SECRET:changeit}
+      #redirect-uri: http://localhost:${server.port}${server.servlet.context-path}/github/callback
+      redirect-uri: http://localhost:8080/github/callback
+      redirect-uri-profile-connect: http://localhost:8080/github/callback/profile
+      response-type: code
+      scope: user
+      token-url-template: "\
+        https://github.com/login/oauth/access_token\
+        ?client_id={clientId}\
+        &client_secret={clientSecret}\
+        &redirect_uri={redirectUri}\
+        &code={code}"
+      token-method: POST
+      api-base-url: https://api.github.com
+      profile-path-template: /user?access_token={accessToken}
+    google:
+      provider: google
+      login-url-template: "\
+        https://accounts.google.com/o/oauth2/v2/auth\
+        ?client_id={clientId}\
+        &redirect_uri={redirectUri}\
+        &response_type={responseType}\
+        &scope={scope}\
+        &state={state}\
+        &access_type={accessType}\
+        &include_granted_scopes={includeGrantedScopes}"
+      client-id: ${GOOGLE_CLIENT_ID:changeit}
+      client-secret: ${GOOGLE_CLIENT_SECRET:changeit}
+      redirect-uri: http://localhost:${server.port}${server.servlet.context-path}/google/callback
+      redirect-uri-profile-connect: http://localhost:8080/profile/google/callback
+      response-type: code
+      scope: profile email
+      additional-login-parameters:
+        includeGrantedScopes: false
+        accessType: online
+#        accessType: offline
+      token-url-template: "\
+        https://www.googleapis.com/oauth2/v4/token\
+        ?client_id={clientId}\
+        &client_secret={clientSecret}\
+        &redirect_uri={redirectUri}\
+        &code={code}\
+        &grant_type=authorization_code"
+      token-method: POST
+      api-base-url: https://www.googleapis.com
+      profile-path-template: /plus/v1/people/me?access_token={accessToken}
+  registration:
+    life-time: 30
+    life-time-unit: days
+    link: http://localhost:${server.port}${server.servlet.context-path}/register?hash={registrationHash}
+    sender: no-reply@bremersee.org
+    subject-code: userRegistrationService.sendValidationEmail.subject
+  samba-connector:
+#    name: smb-con
+    name: false
+    url: http://localhost:8090
+    token-endpoint: http://localhost:${server.port}${server.servlet.context-path}/oauth/token
+  security:
+    crypto:
+      password-encoder:
+        algorithm: SSHA256
+        random-salt-length: 4
+        store-no-encryption-flag: false
+  sms:
+    enabled: false
+    url: https://gate1.goyyamobile.com/sms/sendsms.asp
+    username: ${SMS_USERNAME:changeit}
+    password: ${SMS_PASSWORD:changeit}
+    sender: ${SMS_SENDER:bremersee}
+  startup:
+    admin:
+      user-name: ${ADMIN_USERNAME:admin}
+      password: ${ADMIN_PASSWORD:secret4ADMIN}
+      display-name: ${ADMIN_DISPLAY_NAME:Adam Admin}
+      email: ${ADMIN_EMAIL:admin@bremersee.org}
+      preferred-locale: ${ADMIN_LOCALE:de_DE}
+      preferred-time-zone-id: ${ADMIN_TIME_ZONE:Europe/Berlin}
+#  bremersee.user-listener:
+#    http-listeners:
+#      - name: test
+#        url: http://localhost:8091
+#        client-id: todo
+  user-service:
+    min-search-length: ${USER_MIN_SEARCH_LENGTH:3}
+
+feign:
+  client:
+    config:
+      default:
+        logger-level: FULL
+        connect-timeout: 5000
+        read-timeout: 5000
+      smb-con:
+        logger-level: FULL
+        connect-timeout: 5000
+        read-timeout: 5000
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: true
+    prefer-same-zone-eureka: true
+    service-url:
+      defaultZone: http://eureka:8761/eureka/
+  instance:
+    health-check-url-path: /actuator/health
+    home-page-url-path: /actuator/info
+
+logging:
+  level:
+    ROOT: info
+    org.bremersee: debug
+    org.springframework: info
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: ${SERVER_CONTEXT_PATH:/}
+
+spring:
+  data:
+    mongodb:
+      host: localhost
+#      port: 27017
+#      username: changeit
+#      password: chnageit
+      database: auth
+  jackson:
+    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
+    default-property-inclusion: non_null
+    property-naming-strategy: LOWER_CAMEL_CASE
+    locale: de_DE
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+    time-zone: Europe/Berlin
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:25}
+    username: ${MAIL_USERNAME:no-reply@bremersee.org}
+    password: ${MAIL_PASSWORD:changeit}
+    properties:
+      mail.smtp.auth: ${MAIL_SMTP_AUTH:false}
+      mail.smtp.ssl.enable: ${MAIL_SMTP_SSL_ENABLE:false}
+  messages:
+    basename: messages
+  sleuth:
+    sampler:
+      probability: 1.0
+  thymeleaf:
+    cache: false
+  zipkin:
+    enabled: false
+    base-url: http://zipkin:9411/
+
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          bremersee:
+#            client-id: internal-client
+#            client-secret: secret4INTERNAL
+#            client-name: Client for user scope
+#            provider: bremersee
+#            scope:
+#              - profile
+#              - profile:write
+#            redirect-uri-template: http://localhost:7080
+#            client-authentication-method: basic
+#            authorization-grant-type: authorization_code
+#        provider:
+#          bremersee:
+#            authorization-uri: http://localhost:7080/oauth/authorize
+#            token-uri: http://localhost:7080/oauth/token
+#            user-info-uri: http://localhost:7080/api/me
+#            jwk-set-uri: http://localhost:7080/token_keys
+#            user-name-attribute: name
+
+#security:
+#  oauth2:
+#    client:
+#      client-id: internal-client
+#      client-secret: secret4INTERNAL
+#    resource:
+#      jwt:
+#        key-uri: http://localhost:8080/authman/oauth/token_key
+#      token-info-uri: http://localhost:8080/authman/oauth/check_token
+#      prefer-token-info: true
+
+# curl -v --data "grant_type=refresh_token&client_id=THE_CLIENT_ID&refresh_token=THE_REFRESH_TOKEN" http://localhost:8080/oauth/token

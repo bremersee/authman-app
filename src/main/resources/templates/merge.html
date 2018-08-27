@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+  <title th:text="#{merge.title}">Link Accounts</title>
+  <link rel="stylesheet" href="../static/lib/bootstrap/4.0.0/css/bootstrap.min.css"
+        th:href="@{/lib/bootstrap/4.0.0/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" href="../static/lib/bootstrap-social/5.1.1/bootstrap-social.css"
+        th:href="@{/lib/bootstrap-social/5.1.1/bootstrap-social.css}"/>
+  <link rel="stylesheet" href="../static/lib/font-awesome/4.7.0/css/font-awesome.css"
+        th:href="@{/lib/font-awesome/4.7.0/css/font-awesome.css}"/>
+  <link rel="stylesheet" href="../static/css/app.css"
+        th:href="@{/css/app.css}"/>
+  <script src="../static/lib/jquery/3.2.1/jquery.min.js"
+          th:src="@{/lib/jquery/3.2.1/jquery.min.js}"></script>
+  <script src="../static/lib/popper/1.12.9/popper.js"
+          th:src="@{/lib/popper/1.12.9/popper.js}"></script>
+  <script src="../static/lib/bootstrap/4.0.0/js/bootstrap.min.js"
+          th:src="@{/lib/bootstrap/4.0.0/js/bootstrap.min.js}"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top"
+     th:replace="fragments/header :: header">
+  <a class="navbar-brand" href="#">bremersee.org</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse"
+          data-target="#mainNavbar"
+          aria-controls="mainNavbar" aria-expanded="false"
+          aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="mainNavbar">
+  </div>
+</nav>
+
+<main role="main" class="container">
+  <div class="inner-container">
+
+    <div>
+      <div>
+        <div>
+          <p th:text="#{controller.merge.hello(${profile.displayName})}">Hello Anna Livia
+            Plurabelle,</p>
+          <p th:text="#{controller.merge.hello.next(${provider})}">you signed in to bremersee.org
+            the first time with Google.</p>
+        </div>
+
+        <div id="view0"><!-- merge text -->
+          <p th:text="#{controller.merge.question(${provider})}">
+            Do you have already an account at bremersee.org and you want to link it with your Google
+            account?
+          </p>
+          <!--suppress JSNonStrictModeUsed -->
+          <button type="submit"
+                  class="btn"
+                  onclick="displayMergeAccounts()"
+                  th:text="#{label.yes}">
+            Yes
+          </button>
+          <!--suppress JSNonStrictModeUsed -->
+          <button type="submit"
+                  class="btn"
+                  onclick="displayCreateAccount()"
+                  th:text="#{label.no}">
+            No
+          </button>
+        </div>
+
+        <div id="view1" style="display: none">
+          <p th:text="#{controller.merge.link.text}">
+            Please enter your username and password of your bremersee.org account to link the
+            accounts together.
+            <br/>
+            <span style="font-weight: bold" th:text="#{controller.merge.warn(${provider})}">
+              Do not enter your credentials from Google here!
+            </span>
+          </p>
+          <form th:action="@{'merge'}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <div class="form-group">
+              <label for="username" th:text="#{label.username}">Username</label>
+              <input class="form-control" type="text" id="username" name="username"/>
+            </div>
+            <div class="form-group">
+              <label for="password" th:text="#{label.password}">Password</label>
+              <input class="form-control" type="password" id="password" name="password"/>
+            </div>
+            <!--suppress ThymeleafVariablesResolveInspection -->
+            <div class="form-group alert-danger" th:if="${param.error != null}">
+              <span th:text="#{controller.login.error}">
+                There was a problem logging in. Please try again.
+              </span>
+            </div>
+            <button type="submit"
+                    class="btn btn-primary"
+                    title="Sign In with bremersee"
+                    th:text="#{controller.merge.link}">
+              Link accounts
+            </button>
+          </form>
+        </div>
+
+        <div id="view2" style="display: none">
+          <p th:text="#{controller.merge.create.text(${provider})}">
+            Please enter an username and password for your new account at bremersee.org.
+            Your Google account is than linked together with the new one.
+            <br/>
+            <span style="font-weight: bold" th:text="#{controller.merge.warn(${provider})}">
+              Do not enter your credentials from Google here!
+            </span>
+          </p>
+          <form th:action="@{'merge'}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <div class="form-group">
+              <label for="new_username" th:text="#{label.username}">Username</label>
+              <input class="form-control" type="text" id="new_username" name="new_username"
+                     pattern="^[@a-zA-Z0-9._-]{3,75}$"
+                     th:pattern="${userNamePattern}"/>
+              <div class="invalid-feedback" th:text="#{label.username.invalid}">
+                The username is invalid!
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="new_password" th:text="#{label.password}">
+                Password
+              </label>
+              <input class="form-control" type="password" id="new_password" name="new_password"/>
+            </div>
+            <div class="form-group" id="new_password_repetition_container">
+              <label for="new_password_repetition" id="new_password_repetition_label"
+                     th:text="#{label.password.repeat}">
+                Repeat the password
+              </label>
+              <input class="form-control" type="password" id="new_password_repetition"
+                     name="new_password_repetition"/>
+            </div>
+            <div class="form-group">
+              <!--suppress ThymeleafVariablesResolveInspection -->
+              <div class="alert-danger"
+                   th:if="${param.error != null and param.error[0] == 'BAD_USER_NAME'}"
+                   th:text="#{error.username.BAD_USER_NAME}">
+                The username was not accepted.
+              </div>
+              <!--suppress ThymeleafVariablesResolveInspection -->
+              <div class="alert-danger"
+                   th:if="${param.error != null and param.error[0] == 'ALREADY_EXISTS'}"
+                   th:text="#{error.username.ALREADY_EXISTS}">
+                An user with the selected username already exists.
+              </div>
+              <!--suppress ThymeleafVariablesResolveInspection -->
+              <div class="alert-danger"
+                   th:if="${param.error != null and param.error[0] == 'PASSWORD_TOO_WEAK'}"
+                   th:text="#{label.password.invalid}">
+                The entered password was too weak.
+              </div>
+              <!--suppress ThymeleafVariablesResolveInspection -->
+              <div class="alert-danger"
+                   th:if="${param.error != null and param.error[0] == 'PASSWORDS_ARE_NOT_EQUAL'}"
+                   th:text="#{label.password.repeat.not.match}">
+                The passwords don't match!
+              </div>
+            </div>
+            <button type="submit"
+                    class="btn btn-primary"
+                    title="Create and link accounts"
+                    th:title="#{controller.merge.create.title}"
+                    th:text="#{controller.merge.create}">
+              Create and link accounts
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+<script type="text/javascript">
+  //<![CDATA[
+  'use strict';
+  var getParameter = function get(name) {
+    if (name = (new RegExp('[?&]' + encodeURIComponent(name) + '=([^&]*)')).exec(location.search)) {
+      return decodeURIComponent(name[1]);
+    } else {
+      return undefined;
+    }
+  };
+  var displayView = function (view) {
+    if (typeof view !== 'string' || view === 'view0') {
+      document.getElementById('view0').removeAttribute('style');
+      document.getElementById('view1').setAttribute('style', 'display: none;');
+      document.getElementById('view2').setAttribute('style', 'display: none;');
+    } else if (view === 'view1') {
+      document.getElementById('view0').setAttribute('style', 'display: none;');
+      document.getElementById('view1').removeAttribute('style');
+    } else if (view === 'view2') {
+      document.getElementById('view0').setAttribute('style', 'display: none;');
+      document.getElementById('view2').removeAttribute('style');
+    }
+  };
+  var displayMergeAccounts = function (event) {
+    if (typeof event !== 'undefined') {
+      event.preventDefault();
+    }
+    displayView('view1');
+  };
+  var displayCreateAccount = function (event) {
+    if (typeof event !== 'undefined') {
+      event.preventDefault();
+    }
+    displayView('view2');
+  };
+
+  displayView(getParameter('display'));
+  //]]>
+</script>
+</body>
+</html>
