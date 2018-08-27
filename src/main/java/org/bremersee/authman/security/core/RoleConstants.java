@@ -38,7 +38,7 @@ public abstract class RoleConstants {
 
   public static final String OAUTH2_CLIENT_ROLE = "ROLE_OAUTH2_CLIENT";
 
-  public static String[] USER_ROLES = {
+  public static final String[] USER_ROLES = {
       ACTUATOR_ROLE,
       ADMIN_ROLE,
       USER_ROLE,
@@ -47,7 +47,7 @@ public abstract class RoleConstants {
       LOCAL_MAIL_USER_ROLE
   };
 
-  public static String[] OAUTH2_CLIENT_ROLES = {
+  public static final String[] OAUTH2_CLIENT_ROLES = {
       OAUTH2_CLIENT_ROLE,
       ADMIN_ROLE,
       ACTUATOR_ROLE
