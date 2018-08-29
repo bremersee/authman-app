@@ -17,14 +17,17 @@
 package org.bremersee.smbcon.client;
 
 import feign.RequestInterceptor;
+import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.authman.SambaConnectorProperties;
 import org.bremersee.authman.security.oauth2.client.OAuth2AccessTokenProvider;
 import org.bremersee.authman.security.oauth2.client.OAuth2FeignRequestInterceptor;
+import org.bremersee.common.exhandling.feign.FeignClientExceptionErrorDecoder;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 /**
  * @author Christian Bremer
@@ -41,6 +44,11 @@ public class SambaConnectorClientConfiguration {
 
     log.info("Creating feign request interceptor for samba connector client.");
     return new OAuth2FeignRequestInterceptor(tokenProvider);
+  }
+
+  @Bean
+  public ErrorDecoder errorDecoder(Jackson2ObjectMapperBuilder objectMapperBuilder) {
+    return new FeignClientExceptionErrorDecoder(objectMapperBuilder);
   }
 
 }

@@ -22,7 +22,6 @@ import org.bremersee.authman.domain.OAuth2ClientRepository;
 import org.bremersee.authman.security.oauth2.client.OAuth2AccessTokenProvider;
 import org.bremersee.authman.security.oauth2.client.OAuth2CredentialsClient;
 import org.bremersee.smbcon.client.SambaConnectorClient;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -57,14 +56,14 @@ public class SambaConnectorConfiguration {
 
   @Bean(name = "sambaConnectorAccessTokenProvider")
   public OAuth2AccessTokenProvider sambaConnectorAccessTokenProvider(
-      final ObjectProvider<RestTemplateBuilder> restTemplateBuilder,
-      final ObjectProvider<OAuth2ClientRepository> clientRepository) {
+      RestTemplateBuilder restTemplateBuilder,
+      OAuth2ClientRepository clientRepository) {
 
     log.info("Creating access token provider for samba connector: {}", properties);
     return new OAuth2CredentialsClient(
-        restTemplateBuilder.getIfAvailable(),
+        restTemplateBuilder,
         properties.getTokenEndpoint(),
-        clientRepository.getIfAvailable(),
+        clientRepository,
         properties.getClientId(),
         properties.getUsername(),
         properties.getPassword());

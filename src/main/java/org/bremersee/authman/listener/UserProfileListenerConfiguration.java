@@ -23,12 +23,14 @@ import feign.Retryer.Default;
 import feign.Target;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
+import feign.codec.ErrorDecoder;
 import feign.hystrix.HystrixFeign;
 import org.bremersee.authman.domain.OAuth2ClientRepository;
 import org.bremersee.authman.listener.UserProfileListenerProperties.UserProfileHttpListenerProperties;
 import org.bremersee.authman.listener.api.UserProfileListenerApi;
 import org.bremersee.authman.security.oauth2.client.OAuth2CredentialsClient;
 import org.bremersee.authman.security.oauth2.client.OAuth2FeignRequestInterceptor;
+import org.bremersee.common.exhandling.feign.FeignClientExceptionErrorDecoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -36,6 +38,7 @@ import org.springframework.cloud.openfeign.FeignClientsConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.util.StringUtils;
 
 /**
@@ -46,6 +49,8 @@ import org.springframework.util.StringUtils;
 @Import(FeignClientsConfiguration.class)
 public class UserProfileListenerConfiguration {
 
+  private final UserProfileListenerFallback fallback = new UserProfileListenerFallback();
+
   private final UserProfileListenerProperties properties;
 
   private final Decoder decoder;
@@ -53,6 +58,8 @@ public class UserProfileListenerConfiguration {
   private final Encoder encoder;
 
   private final Client client;
+
+  private final ErrorDecoder errorDecoder;
 
   private final RestTemplateBuilder restTemplateBuilder;
 
@@ -64,6 +71,7 @@ public class UserProfileListenerConfiguration {
       final Decoder decoder,
       final Encoder encoder,
       final Client client,
+      final Jackson2ObjectMapperBuilder objectMapperBuilder,
       final RestTemplateBuilder restTemplateBuilder,
       final OAuth2ClientRepository clientRepository) {
 
@@ -71,6 +79,7 @@ public class UserProfileListenerConfiguration {
     this.decoder = decoder;
     this.encoder = encoder;
     this.client = client;
+    this.errorDecoder = new FeignClientExceptionErrorDecoder(objectMapperBuilder);
     this.restTemplateBuilder = restTemplateBuilder;
     this.clientRepository = clientRepository;
   }
@@ -128,9 +137,10 @@ public class UserProfileListenerConfiguration {
             properties.getReadTimeoutMillis()))
         .decoder(decoder)
         .encoder(encoder)
+        .errorDecoder(errorDecoder)
         .logLevel(properties.getFeignLogLevel())
         .requestInterceptor(new OAuth2FeignRequestInterceptor(tokenProvider))
         .retryer(retryer)
-        .target(target, new UserProfileListenerFallback());
+        .target(target, fallback);
   }
 }

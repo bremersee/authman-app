@@ -142,8 +142,8 @@ bremersee:
     sender: no-reply@bremersee.org
     subject-code: userRegistrationService.sendValidationEmail.subject
   samba-connector:
-#    name: smb-con
-    name: false
+    name: smb-con
+#    name: false
     url: http://localhost:8090
     token-endpoint: http://localhost:${server.port}${server.servlet.context-path}/oauth/token
   security:

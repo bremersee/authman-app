@@ -47,6 +47,7 @@ public class MeRestController {
       method = RequestMethod.GET,
       produces = {MediaType.APPLICATION_JSON_VALUE})
   public UserProfileDto me(Principal me) {
+
     UserProfileDto userProfile = userProfileService.getUserProfile(me.getName());
     log.debug("Returning me: {}", userProfile);
     return userProfile;
