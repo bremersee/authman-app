@@ -19,8 +19,18 @@ package org.bremersee.authman;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.common.exhandling.ApiExceptionMapper;
+import org.bremersee.common.exhandling.ApiExceptionMapperImpl;
+import org.bremersee.common.exhandling.ApiExceptionResolver;
+import org.bremersee.common.exhandling.ApiExceptionResolverProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -32,7 +42,27 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
  * @author Christian Bremer
  */
 @Configuration
+@EnableConfigurationProperties({ApiExceptionResolverProperties.class})
+@Slf4j
 public class WebMvcConfiguration implements WebMvcConfigurer {
+
+  private final ApiExceptionResolver apiExceptionResolver;
+
+  @Autowired
+  public WebMvcConfiguration(
+      final Environment env,
+      final ApiExceptionResolverProperties apiExceptionResolverProperties,
+      final Jackson2ObjectMapperBuilder objectMapperBuilder) {
+
+    final ApiExceptionMapper apiExceptionMapper = new ApiExceptionMapperImpl(
+        apiExceptionResolverProperties,
+        env.getProperty("spring.application.name"));
+
+    this.apiExceptionResolver = new ApiExceptionResolver(
+        apiExceptionResolverProperties,
+        apiExceptionMapper);
+    this.apiExceptionResolver.setObjectMapperBuilder(objectMapperBuilder);
+  }
 
   @Bean
   public LocaleResolver localeResolver() {
@@ -109,5 +139,10 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 //        .addResourceHandler("/webjars/**")
 //        .addResourceLocations("classpath:/META-INF/resources/webjars/");
 //  }
+
+  @Override
+  public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
+    exceptionResolvers.add(0, apiExceptionResolver);
+  }
 
 }

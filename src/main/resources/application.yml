@@ -1,9 +1,8 @@
 bremersee:
   access:
-    authorities:
-      - ROLE_ACTUATOR
     ip-addresses:
-      - 127.0.0.1
+      - "127.0.0.1"
+      - "::1"
   authorization-server:
     allow-form-authentication-for-clients: false
     check-token-access: isAuthenticated()
@@ -130,6 +129,12 @@ bremersee:
       token-method: POST
       api-base-url: https://www.googleapis.com
       profile-path-template: /plus/v1/people/me?access_token={accessToken}
+  password-reset:
+    link: http://localhost:8080/password-reset?hash={requestHash}
+    sender: no-reply@bremersee.org
+    subject-code: password.reset.request.subject
+    life-time: 7
+    life-time-unit: days
   registration:
     life-time: 30
     life-time-unit: days
@@ -161,11 +166,6 @@ bremersee:
       email: ${ADMIN_EMAIL:admin@bremersee.org}
       preferred-locale: ${ADMIN_LOCALE:de_DE}
       preferred-time-zone-id: ${ADMIN_TIME_ZONE:Europe/Berlin}
-#  bremersee.user-listener:
-#    http-listeners:
-#      - name: test
-#        url: http://localhost:8091
-#        client-id: todo
   user-service:
     min-search-length: ${USER_MIN_SEARCH_LENGTH:3}
 
@@ -216,7 +216,7 @@ spring:
 #      port: 27017
 #      username: changeit
 #      password: chnageit
-      database: auth
+      database: authman
   jackson:
     date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
     default-property-inclusion: non_null
@@ -224,7 +224,7 @@ spring:
     locale: de_DE
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
-    time-zone: Europe/Berlin
+    time-zone: GMT
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:25}

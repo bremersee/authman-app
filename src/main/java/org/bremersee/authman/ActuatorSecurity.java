@@ -19,10 +19,11 @@ package org.bremersee.authman;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
@@ -31,14 +32,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  */
 @Order(101)
 @Configuration
-@EnableConfigurationProperties(AccessProperties.class)
+@EnableConfigurationProperties(ActuatorSecurityProperties.class)
 @Slf4j
 public class ActuatorSecurity extends WebSecurityConfigurerAdapter {
 
-  private final AccessProperties properties;
+  private final ActuatorSecurityProperties properties;
 
   @Autowired
-  public ActuatorSecurity(AccessProperties properties) {
+  public ActuatorSecurity(ActuatorSecurityProperties properties) {
     this.properties = properties;
   }
 
@@ -51,8 +52,8 @@ public class ActuatorSecurity extends WebSecurityConfigurerAdapter {
         .and()
         .requestMatcher(EndpointRequest.toAnyEndpoint())
         .authorizeRequests()
-        .antMatchers(HttpMethod.GET, "/actuator/health").permitAll()
-        .antMatchers(HttpMethod.GET, "/actuator/info").permitAll()
+        .requestMatchers(EndpointRequest.to(HealthEndpoint.class)).permitAll()
+        .requestMatchers(EndpointRequest.to(InfoEndpoint.class)).permitAll()
         .anyRequest()
         .access(properties.buildAccess());
   }

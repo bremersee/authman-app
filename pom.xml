@@ -35,6 +35,7 @@
     <dependency.locations.enabled>false</dependency.locations.enabled>
     <dockerfile-maven-version>1.4.0</dockerfile-maven-version>
     <dockerfile.skip>true</dockerfile.skip>
+    <dockerfile.tag>latest</dockerfile.tag>
     <findbugs.version>3.0.1</findbugs.version>
     <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
     <maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
@@ -594,7 +595,7 @@
           <skip>${dockerfile.skip}</skip>
           <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
           <repository>docker.io/bremersee/authman</repository>
-          <tag>latest</tag>
+          <tag>${dockerfile.tag}</tag>
           <buildArgs>
             <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
           </buildArgs>
@@ -602,5 +603,14 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>dockerfile</id>
+      <properties>
+        <dockerfile.skip>false</dockerfile.skip>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>

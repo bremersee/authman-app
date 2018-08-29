@@ -41,7 +41,7 @@ public class PasswordResetProperties {
 
   private ChronoUnit lifeTimeUnit = ChronoUnit.DAYS;
 
-  private String link = "http://localhost:8080/authman/password-reset?hash={requestHash}";
+  private String link = "http://localhost:8080/password-reset?hash={requestHash}";
 
   private String sender = "no-reply@bremersee.org";
 
