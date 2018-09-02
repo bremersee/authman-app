@@ -152,8 +152,23 @@ public abstract class OAuth2AuthenticationProperties implements Serializable {
       params.putAll(additionalParameters);
     }
     log.info("msg=[OAuth2 redirect] additionalParameters=[{}]", params);
-    final boolean urlHasParameter = url.contains("?");
-    final StringBuilder urlBuilder = new StringBuilder(url);
+
+    // first remove placeholders
+    String tmpUrl = url;
+    for (Map.Entry<String, String> param : (new LinkedHashMap<>(params)).entrySet()) {
+      final String key = "{" + param.getKey() + "}";
+      final String value = StringUtils.hasText(param.getValue()) ? URLEncoder
+          .encode(param.getValue(), StandardCharsets.UTF_8.name()) : "";
+      final String tmp = tmpUrl.replace(key, value);
+      if (!tmp.equals(tmpUrl)) {
+        tmpUrl = tmp;
+        params.remove(param.getKey());
+      }
+    }
+
+    // than add parameters
+    final boolean urlHasParameter = tmpUrl.contains("?");
+    final StringBuilder urlBuilder = new StringBuilder(tmpUrl);
     for (Map.Entry<String, String> param : params.entrySet()) {
       final String value = StringUtils.hasText(param.getValue()) ? URLEncoder
           .encode(param.getValue(), StandardCharsets.UTF_8.name()) : "";

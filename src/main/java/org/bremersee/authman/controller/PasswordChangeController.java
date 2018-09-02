@@ -20,8 +20,6 @@ import java.io.Serializable;
 import javax.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.authman.business.UserProfileService;
@@ -71,18 +69,19 @@ public class PasswordChangeController extends AbstractController {
     return validationProperties.getPasswordPattern().pattern();
   }
 
+  @ModelAttribute("passwordPresent")
+  public boolean passwordPresent() {
+    final String userName = SecurityHelper.getCurrentUserName();
+    Assert.notNull(userName, "User name must be present.");
+    return userProfileService.isPasswordPresent(userName);
+  }
+
   @GetMapping
   public String displayChangePasswordView(final ModelMap model) {
 
-    final String userName = SecurityHelper.getCurrentUserName();
-    Assert.notNull(userName, "User name must be present.");
-    final boolean isPasswordPresent = userProfileService.isPasswordPresent(userName);
-    log.info("Displaying change password view for user [{}]. User has password? {}",
-        userName, isPasswordPresent);
-
     if (!model.containsAttribute("changePasswordCmd")) {
       model.addAttribute("changePasswordCmd",
-          new PasswordChangeCommand(isPasswordPresent));
+          new PasswordChangeCommand());
     }
     return "password-change";
   }
@@ -146,16 +145,9 @@ public class PasswordChangeController extends AbstractController {
   @Getter
   @Setter
   @NoArgsConstructor
-  @RequiredArgsConstructor
   public static class PasswordChangeCommand implements Serializable {
 
     private static final long serialVersionUID = 90409218782407443L;
-
-    /**
-     * Has the user a password?
-     */
-    @NonNull
-    private boolean currentPasswordPresent;
 
     /**
      * Current password value.

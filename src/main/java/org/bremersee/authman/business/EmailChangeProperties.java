@@ -41,7 +41,7 @@ public class EmailChangeProperties {
 
   private ChronoUnit lifeTimeUnit = ChronoUnit.DAYS;
 
-  private String link = "http://localhost:8080/authman/email-change?hash={requestHash}";
+  private String link = "http://localhost:8080/email-change?hash={requestHash}";
 
   private String sender = "no-reply@bremersee.org";
 

@@ -129,14 +129,14 @@ public class EmailChangeServiceImpl implements EmailChangeService, MessageSource
       final UserProfile userProfile,
       final EmailChangeRequest request) {
 
-    MimeMessagePreparator preparator = mimeMessage -> {
+    final MimeMessagePreparator preparator = mimeMessage -> {
 
       final String hash = URLEncoder
           .encode(request.getChangeHash(), StandardCharsets.UTF_8.name());
       final String href = emailChangeProperties.getLink().replace("{requestHash}", hash);
 
       mimeMessage
-          .setRecipient(Message.RecipientType.TO, new InternetAddress(userProfile.getEmail()));
+          .setRecipient(Message.RecipientType.TO, new InternetAddress(request.getNewEmail()));
       mimeMessage.setFrom(new InternetAddress(emailChangeProperties.getSender()));
       mimeMessage.setSubject(getSubject(userProfile));
       mimeMessage.setText("Dear " + userProfile.getDisplayName()
