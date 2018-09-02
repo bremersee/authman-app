@@ -225,7 +225,7 @@ spring:
       host: localhost
 #      port: 27017
 #      username: changeit
-#      password: chnageit
+#      password: changeit
       database: authman
   jackson:
     date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
