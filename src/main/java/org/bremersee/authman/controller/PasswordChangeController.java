@@ -32,6 +32,7 @@ import org.bremersee.authman.validation.ValidationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,6 +75,7 @@ public class PasswordChangeController extends AbstractController {
   public String displayChangePasswordView(final ModelMap model) {
 
     final String userName = SecurityHelper.getCurrentUserName();
+    Assert.notNull(userName, "User name must be present.");
     final boolean isPasswordPresent = userProfileService.isPasswordPresent(userName);
     log.info("Displaying change password view for user [{}]. User has password? {}",
         userName, isPasswordPresent);
@@ -96,6 +98,7 @@ public class PasswordChangeController extends AbstractController {
 
     final String userName = SecurityHelper.getCurrentUserName();
     log.info("Changing password of user {}.", userName);
+    Assert.notNull(userName, "User name must be present.");
 
     final String newPassword = passwordChangeCommand.getPassword();
     final String newPasswordRepetition = passwordChangeCommand.getPasswordRepetition();

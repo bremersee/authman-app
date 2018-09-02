@@ -142,8 +142,8 @@ bremersee:
     sender: no-reply@bremersee.org
     subject-code: userRegistrationService.sendValidationEmail.subject
   samba-connector:
-    name: smb-con
-#    name: false
+#    name: smb-con
+    name: false
     url: http://localhost:8090
     token-endpoint: http://localhost:${server.port}${server.servlet.context-path}/oauth/token
   security:
@@ -244,6 +244,9 @@ spring:
     enabled: false
     base-url: http://zipkin:9411/
 
+---
+
+
 #  security:
 #    oauth2:
 #      client:
@@ -279,3 +282,15 @@ spring:
 #      prefer-token-info: true
 
 # curl -v --data "grant_type=refresh_token&client_id=THE_CLIENT_ID&refresh_token=THE_REFRESH_TOKEN" http://localhost:8080/oauth/token
+
+spring:
+  profiles: mailcowcon
+bremersee:
+  user-listener:
+    http-listeners:
+    - feign-name: mailcow-connector
+      feign-url: http://localhost:8091
+      feign-logger-level: FULL
+      enabled: true
+      client-id: internal-client
+      token-endpoint: http://localhost:${server.port}${server.servlet.context-path}/oauth/token

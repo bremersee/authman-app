@@ -125,8 +125,6 @@ public class AuthorizationServerProperties {
 
   private OAuth2ClientDto internalClient = new OAuth2ClientDto();
 
-  private OAuth2ClientDto listenerClient = new OAuth2ClientDto();
-
   private OAuth2ClientDto sambaConnectorClient = new OAuth2ClientDto();
 
   private List<OAuth2ClientDto> otherClients = new ArrayList<>();
@@ -165,16 +163,6 @@ public class AuthorizationServerProperties {
 
     defaultScopes.add(PROFILE_READ_SCOPE);
 
-    listenerClient.setDisplayName("Authman Listener Client");
-    listenerClient.setClientId("authman-listener-client");
-    listenerClient.setClientSecret(PasswordUtils
-        .createRandomClearPassword(64, false, false));
-    listenerClient.setClientSecretEncrypted(false);
-    listenerClient.getAuthorizedGrantTypes().add(CLIENT_CREDENTIALS);
-    listenerClient.getAuthorizedGrantTypes().add(PASSWORD_CREDENTIALS);
-    listenerClient.getScope().add(PROFILE_SYNC_SCOPE);
-    listenerClient.getAutoApproveScopes().add(Boolean.TRUE.toString());
-
     sambaConnectorClient.setDisplayName("Samba Connector Client");
     sambaConnectorClient.setClientId("smb-con-client");
     sambaConnectorClient.setClientSecret(PasswordUtils
@@ -198,6 +186,7 @@ public class AuthorizationServerProperties {
     internalClient.getAuthorizedGrantTypes().add(IMPLICIT); // -> response_type=token
     internalClient.getScope().add(PROFILE_READ_SCOPE);
     internalClient.getScope().add(PROFILE_WRITE_SCOPE);
+    internalClient.getScope().add(PROFILE_SYNC_SCOPE);
     internalClient.getAutoApproveScopes().add(Boolean.TRUE.toString());
 
   }

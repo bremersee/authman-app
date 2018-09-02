@@ -17,6 +17,7 @@
 package org.bremersee.authman.listener;
 
 import feign.Client;
+import feign.Contract;
 import feign.Request;
 import feign.Retryer;
 import feign.Retryer.Default;
@@ -25,6 +26,7 @@ import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
 import feign.hystrix.HystrixFeign;
+import lombok.extern.slf4j.Slf4j;
 import org.bremersee.authman.domain.OAuth2ClientRepository;
 import org.bremersee.authman.listener.UserProfileListenerProperties.UserProfileHttpListenerProperties;
 import org.bremersee.authman.listener.api.UserProfileListenerApi;
@@ -35,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.openfeign.FeignClientsConfiguration;
+import org.springframework.cloud.openfeign.FeignLoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -47,19 +50,24 @@ import org.springframework.util.StringUtils;
 @Configuration
 @EnableConfigurationProperties({UserProfileListenerProperties.class})
 @Import(FeignClientsConfiguration.class)
+@Slf4j
 public class UserProfileListenerConfiguration {
 
   private final UserProfileListenerFallback fallback = new UserProfileListenerFallback();
 
   private final UserProfileListenerProperties properties;
 
+  private final Contract contract;
+
+  private final Client client;
+
   private final Decoder decoder;
 
   private final Encoder encoder;
 
-  private final Client client;
-
   private final ErrorDecoder errorDecoder;
+
+  private final FeignLoggerFactory loggerFactory;
 
   private final RestTemplateBuilder restTemplateBuilder;
 
@@ -68,18 +76,22 @@ public class UserProfileListenerConfiguration {
   @Autowired
   public UserProfileListenerConfiguration(
       final UserProfileListenerProperties properties,
+      final Contract contract,
+      final Client client,
       final Decoder decoder,
       final Encoder encoder,
-      final Client client,
+      final FeignLoggerFactory loggerFactory,
       final Jackson2ObjectMapperBuilder objectMapperBuilder,
       final RestTemplateBuilder restTemplateBuilder,
       final OAuth2ClientRepository clientRepository) {
 
     this.properties = properties;
+    this.contract = contract;
+    this.client = client;
     this.decoder = decoder;
     this.encoder = encoder;
-    this.client = client;
     this.errorDecoder = new FeignClientExceptionErrorDecoder(objectMapperBuilder);
+    this.loggerFactory = loggerFactory;
     this.restTemplateBuilder = restTemplateBuilder;
     this.clientRepository = clientRepository;
   }
@@ -128,19 +140,46 @@ public class UserProfileListenerConfiguration {
       throw new IllegalArgumentException("Feign name and/or url must be present.");
     }
 
-    // A feign builder without hystrix: Feign.builder()
-    return HystrixFeign
+    /*
+    return Feign
         .builder()
-        .client(client)
+        .contract(contract)
+        .client(client(properties))
         .options(new Request.Options(
             properties.getConnectTimeoutMillis(),
             properties.getReadTimeoutMillis()))
         .decoder(decoder)
         .encoder(encoder)
         .errorDecoder(errorDecoder)
-        .logLevel(properties.getFeignLogLevel())
+        .logger(loggerFactory.create(UserProfileListenerApi.class))
+        .logLevel(properties.getFeignLoggerLevel())
         .requestInterceptor(new OAuth2FeignRequestInterceptor(tokenProvider))
         .retryer(retryer)
+        .target(target);
+    */
+
+    return HystrixFeign
+        .builder()
+        .contract(contract)
+        .client(client(properties))
+        .options(new Request.Options(
+            properties.getConnectTimeoutMillis(),
+            properties.getReadTimeoutMillis()))
+        .decoder(decoder)
+        .encoder(encoder)
+        .errorDecoder(errorDecoder)
+        .logger(loggerFactory.create(UserProfileListenerApi.class))
+        .logLevel(properties.getFeignLoggerLevel())
+        .requestInterceptor(new OAuth2FeignRequestInterceptor(tokenProvider))
+        .retryer(retryer)
+        //.target(target);
         .target(target, fallback);
+  }
+
+  private Client client(final UserProfileHttpListenerProperties properties) {
+    if (StringUtils.hasText(properties.getFeignUrl())) {
+      return new Client.Default(null, null);
+    }
+    return client;
   }
 }

@@ -22,6 +22,7 @@ import org.bremersee.authman.business.OAuth2ClientService;
 import org.bremersee.authman.business.OAuth2ScopeService;
 import org.bremersee.authman.business.RoleService;
 import org.bremersee.authman.business.UserProfileService;
+import org.bremersee.authman.model.OAuth2ClientDto;
 import org.bremersee.authman.model.OAuth2ScopeDto;
 import org.bremersee.authman.security.core.RoleConstants;
 import org.bremersee.authman.security.core.SecurityHelper;
@@ -159,6 +160,12 @@ public class StartupConfiguration {
       roleService.addRole(
           authorizationServerProperties.getSambaConnectorClient().getClientId(),
           RoleConstants.SAMBA_ADMIN_ROLE);
+
+      for (final OAuth2ClientDto client : authorizationServerProperties.getOtherClients()) {
+        if (!clientService.isClientExisting(client.getClientId())) {
+          clientService.createClient(client);
+        }
+      }
     }
   }
 

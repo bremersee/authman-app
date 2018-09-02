@@ -54,7 +54,7 @@ public class UserProfileListenerProperties implements Serializable {
 
     private String feignUrl;
 
-    private Level feignLogLevel = Level.BASIC;
+    private Level feignLoggerLevel = Level.BASIC;
 
     private int connectTimeoutMillis = 10 * 1000;
 
