@@ -19,10 +19,12 @@ package org.bremersee.authman.security.oauth2.client;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import javax.validation.constraints.NotNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Christian Bremer
  */
+@Slf4j
 public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 
   private static final String BEARER = "Bearer";
@@ -31,8 +33,6 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 
   private final OAuth2AccessTokenProvider tokenProvider;
 
-  org.springframework.cloud.security.oauth2.client.feign.OAuth2FeignRequestInterceptor a;
-
   public OAuth2FeignRequestInterceptor(
       @NotNull final OAuth2AccessTokenProvider tokenProvider) {
     this.tokenProvider = tokenProvider;
@@ -40,6 +40,10 @@ public class OAuth2FeignRequestInterceptor implements RequestInterceptor {
 
   @Override
   public void apply(RequestTemplate requestTemplate) {
-    requestTemplate.header(AUTHORIZATION, BEARER + " " + tokenProvider.getAccessToken());
+    final String bearer = tokenProvider.getAccessToken();
+    if (log.isDebugEnabled()) {
+      log.debug("msg=[Adding bearer from token provider to request.] bearer=[{}]", bearer);
+    }
+    requestTemplate.header(AUTHORIZATION, BEARER + " " + bearer);
   }
 }
