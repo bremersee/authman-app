@@ -30,7 +30,6 @@ import org.bremersee.authman.business.OAuth2ForeignTokenService;
 import org.bremersee.authman.business.RoleService;
 import org.bremersee.authman.business.SambaConnectorService;
 import org.bremersee.authman.business.UserProfileService;
-import org.bremersee.authman.controller.AbstractController;
 import org.bremersee.authman.controller.RedirectMessage;
 import org.bremersee.authman.controller.RedirectMessageType;
 import org.bremersee.authman.exception.EmailAlreadyExistsException;
@@ -45,7 +44,6 @@ import org.bremersee.authman.security.authentication.github.GitHubAuthentication
 import org.bremersee.authman.security.authentication.google.GoogleAuthenticationProperties;
 import org.bremersee.authman.security.core.RoleConstants;
 import org.bremersee.authman.validation.ValidationProperties;
-import org.bremersee.smbcon.model.SambaGroupItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Controller;
@@ -71,7 +69,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 })
 @RequestMapping(path = "/admin/edit-user")
 @Slf4j
-public class UserProfileEditController extends AbstractController {
+public class UserProfileEditController extends AbstractUserProfileChangeController {
 
   private final ValidationProperties validationProperties;
 
@@ -87,8 +85,6 @@ public class UserProfileEditController extends AbstractController {
 
   private final RoleService roleService;
 
-  private final SambaConnectorService sambaConnectorService;
-
   @Autowired
   public UserProfileEditController( // NOSONAR
       final ValidationProperties validationProperties,
@@ -101,7 +97,7 @@ public class UserProfileEditController extends AbstractController {
       final SambaConnectorService sambaConnectorService,
       final LocaleResolver localeResolver) {
 
-    super(localeResolver);
+    super(sambaConnectorService, localeResolver);
     this.validationProperties = validationProperties;
     this.facebookProperties = facebookProperties;
     this.gitHubProperties = gitHubProperties;
@@ -109,7 +105,6 @@ public class UserProfileEditController extends AbstractController {
     this.userProfileService = userProfileService;
     this.foreignTokenService = foreignTokenService;
     this.roleService = roleService;
-    this.sambaConnectorService = sambaConnectorService;
   }
 
   @ModelAttribute("gitHubConnected")
@@ -191,17 +186,16 @@ public class UserProfileEditController extends AbstractController {
     } else {
       sambaGroups = new HashSet<>();
     }
-    final List<SambaGroupItem> groups = sambaConnectorService.getGroups();
+    final List<SelectOptionDto> groups = super.sambaGroups();
     if (groups == null) {
       return Collections.emptyList();
     }
     return groups
         .stream()
-        .map(sambaGroupItem -> new SelectOptionDto(
-            urlEncode(normalizeDistinguishedName(sambaGroupItem.getDistinguishedName())),
-            sambaGroupItem.getName(),
-            sambaGroups.contains(
-                normalizeDistinguishedName(sambaGroupItem.getDistinguishedName()))))
+        .map(option -> new SelectOptionDto(
+            option.getValue(),
+            option.getDisplayValue(),
+            sambaGroups.contains(normalizeDistinguishedName(option.getValue()))))
         .collect(Collectors.toList());
   }
 

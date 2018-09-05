@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
 import org.bremersee.authman.security.core.context.RunAsAuthentication;
 import org.bremersee.authman.security.core.context.RunAsCallback;
@@ -31,18 +32,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 /**
  * @author Christian Bremer
  */
-public interface SecurityHelper {
+@Slf4j
+public abstract class SecurityHelper {
 
-  static boolean isCurrentUserName(String userName) {
+  public static boolean isCurrentUserName(String userName) {
     return userName != null && userName.equals(getCurrentUserName());
   }
 
-  static String getCurrentUserName() {
+  public static String getCurrentUserName() {
     final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     return authentication == null ? null : authentication.getName();
   }
 
-  static Set<String> getCurrentUserRoles() {
+  public static Set<String> getCurrentUserRoles() {
     final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     return authentication == null ? Collections.emptySet() : authentication.getAuthorities()
         .stream()
@@ -50,11 +52,11 @@ public interface SecurityHelper {
         .collect(Collectors.toSet());
   }
 
-  static boolean currentUserHasRole(@NotNull String role) {
+  public static boolean currentUserHasRole(@NotNull String role) {
     return getCurrentUserRoles().contains(role);
   }
 
-  static boolean isCurrentUserAdmin() {
+  public static boolean isCurrentUserAdmin() {
     return getCurrentUserRoles().contains(RoleConstants.ADMIN_ROLE);
   }
 
@@ -67,7 +69,8 @@ public interface SecurityHelper {
    * @param <T>      the response type
    * @return the response of the callback
    */
-  static <T> T runAs(final String name, final String[] roles, final RunAsCallback<T> callback) {
+  public static <T> T runAs(final String name, final String[] roles,
+      final RunAsCallback<T> callback) {
     Validate.notBlank(name, "Name mast not be null or blank");
     final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     try {
@@ -85,7 +88,7 @@ public interface SecurityHelper {
    * @param roles    the roles of the executing authority
    * @param callback the callback which should be executed
    */
-  static void runAsWithoutResult(final String name, final String[] roles,
+  public static void runAsWithoutResult(final String name, final String[] roles,
       final RunAsCallbackWithoutResult callback) {
     runAs(name, roles, callback);
   }

@@ -122,7 +122,7 @@ public class OAuth2ClientsController extends AbstractController {
         .writerWithDefaultPrettyPrinter().writeValueAsBytes(postmanCollection);
     response.setContentType("application/json");
     response.setHeader("Content-Disposition",
-        "attachment; filename=\"" + clientId +".postman_collection.json\""); // inline
+        "attachment; filename=\"" + clientId + ".postman_collection.json\""); // inline
     response.setContentLength(jsonBytes.length);
     response.getOutputStream().write(jsonBytes);
     response.getOutputStream().flush();

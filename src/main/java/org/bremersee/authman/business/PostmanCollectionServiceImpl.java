@@ -22,7 +22,6 @@ import static org.bremersee.authman.AuthorizationServerProperties.IMPLICIT;
 import static org.bremersee.authman.AuthorizationServerProperties.PASSWORD_CREDENTIALS;
 import static org.bremersee.authman.AuthorizationServerProperties.REFRESH_TOKEN;
 
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -131,7 +130,8 @@ public class PostmanCollectionServiceImpl implements PostmanCollectionService {
     return new Collection();
   }
 
-  @HystrixCommand(fallbackMethod = "emptyCollection")
+  // With hystrix I lost the security context
+  //@HystrixCommand(fallbackMethod = "emptyCollection")
   @Override
   public Collection generatePostmanCollection(
       @NotNull String clientId,

@@ -228,6 +228,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.GET, "/password-reset*").permitAll()
         .antMatchers(HttpMethod.POST, "/password-reset*").permitAll()
         .antMatchers(HttpMethod.GET, "/logged-out*").permitAll()
+
+        .antMatchers("/developer/**").hasAuthority(RoleConstants.DEVELOPER_ROLE)
+        .antMatchers("/admin/**").hasAuthority(RoleConstants.ADMIN_ROLE)
+
         .anyRequest().hasAuthority(RoleConstants.USER_ROLE)
 
         .and()

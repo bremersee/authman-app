@@ -17,7 +17,6 @@
 package org.bremersee.authman.controller.admin;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -29,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.bremersee.authman.business.RoleService;
 import org.bremersee.authman.business.SambaConnectorService;
 import org.bremersee.authman.business.UserProfileService;
-import org.bremersee.authman.controller.AbstractController;
 import org.bremersee.authman.controller.RedirectMessage;
 import org.bremersee.authman.controller.RedirectMessageType;
 import org.bremersee.authman.exception.EmailAlreadyExistsException;
@@ -43,7 +41,6 @@ import org.bremersee.authman.model.SelectOptionDto;
 import org.bremersee.authman.model.UserProfileDto;
 import org.bremersee.authman.security.core.RoleConstants;
 import org.bremersee.authman.validation.ValidationProperties;
-import org.bremersee.smbcon.model.SambaGroupItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -62,15 +59,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping(path = "/admin/add-user")
 @Slf4j
-public class UserProfileAddController extends AbstractController {
+public class UserProfileAddController extends AbstractUserProfileChangeController {
 
   private final ValidationProperties validationProperties;
 
   private final UserProfileService userProfileService;
 
   private final RoleService roleService;
-
-  private final SambaConnectorService sambaConnector;
 
   @Autowired
   public UserProfileAddController(
@@ -79,11 +74,10 @@ public class UserProfileAddController extends AbstractController {
       final RoleService roleService,
       final SambaConnectorService sambaConnectorService,
       final LocaleResolver localeResolver) {
-    super(localeResolver);
+    super(sambaConnectorService, localeResolver);
     this.validationProperties = validationProperties;
     this.userProfileService = userProfileService;
     this.roleService = roleService;
-    this.sambaConnector = sambaConnectorService;
   }
 
   @ModelAttribute("userNamePattern")
@@ -119,17 +113,7 @@ public class UserProfileAddController extends AbstractController {
 
   @ModelAttribute("sambaGroups")
   public List<SelectOptionDto> sambaGroups() {
-    final List<SambaGroupItem> groups = sambaConnector.getGroups();
-    if (groups == null) {
-      return Collections.emptyList();
-    }
-    return groups
-        .stream()
-        .map(sambaGroupItem -> new SelectOptionDto(
-            sambaGroupItem.getDistinguishedName(),
-            sambaGroupItem.getName(),
-            false))
-        .collect(Collectors.toList());
+    return super.sambaGroups();
   }
 
   @GetMapping
