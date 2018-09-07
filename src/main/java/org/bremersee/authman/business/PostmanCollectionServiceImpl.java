@@ -69,6 +69,10 @@ public class PostmanCollectionServiceImpl implements PostmanCollectionService {
 
   private static final String CODE = "code";
 
+  private static final String STATE = "state";
+
+  private static final String STATE_VALUE = "changeme";
+
   private static final String CLIENT_ID = "client_id";
 
   private static final String REDIRECT_URI = "redirect_uri";
@@ -120,18 +124,6 @@ public class PostmanCollectionServiceImpl implements PostmanCollectionService {
     this.passwordEncoder = new PasswordEncoderImpl(pep);
   }
 
-  public Collection emptyCollection(
-      @NotNull String clientId,
-      @NotNull String scheme,
-      @NotNull String host,
-      int port) {
-
-    log.info("Generation EMPTY postman collection of client [{}].", clientId);
-    return new Collection();
-  }
-
-  // With hystrix I lost the security context
-  //@HystrixCommand(fallbackMethod = "emptyCollection")
   @Override
   public Collection generatePostmanCollection(
       @NotNull String clientId,
@@ -199,6 +191,7 @@ public class PostmanCollectionServiceImpl implements PostmanCollectionService {
     url0.setRaw(getUrlPrefix(scheme, host, port) + contextPath + oauthPath + authorizePath
         + "?response_type=code"
         + "&client_id=" + client.getClientId()
+        + "&state=" + STATE_VALUE
         + "&redirect_uri=" + getCallbackUrl(client));
     url0.setProtocol(scheme);
     url0.setHost(getHost(host));
@@ -208,6 +201,7 @@ public class PostmanCollectionServiceImpl implements PostmanCollectionService {
         Url.buildQuery(
             new Query(RESPONSE_TYPE, CODE, true),
             new Query(CLIENT_ID, client.getClientId(), true),
+            new Query(STATE, STATE_VALUE, true),
             new Query(REDIRECT_URI, getCallbackUrl(client), true)
         )
     );
