@@ -40,6 +40,10 @@ public class UserProfileListenerProperties implements Serializable {
 
   private List<UserProfileHttpListenerProperties> httpListeners = new ArrayList<>();
 
+  private boolean hystrixEnabled = true;
+
+  private boolean ribbonEnabled = true;
+
   @Getter
   @Setter
   @ToString(exclude = {"password"})
@@ -74,5 +78,20 @@ public class UserProfileListenerProperties implements Serializable {
 
     private String password;
 
+    private Boolean hystrixEnabled;
+
+    private Boolean ribbonEnabled;
+
+    public boolean isHystrixEnabled(UserProfileListenerProperties defaults) {
+      return hystrixEnabled != null
+          ? hystrixEnabled
+          : defaults != null &&defaults.isHystrixEnabled();
+    }
+
+    public boolean isRibbonEnabled(UserProfileListenerProperties defaults) {
+      return ribbonEnabled != null
+          ? ribbonEnabled
+          : defaults != null && defaults.isRibbonEnabled();
+    }
   }
 }

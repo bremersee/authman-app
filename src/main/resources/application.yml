@@ -202,6 +202,7 @@ eureka:
     health-check-url-path: /actuator/health
     home-page-url-path: /actuator/info
 
+
 logging:
   level:
     ROOT: info
@@ -258,6 +259,8 @@ spring:
   profiles: mailcowcon
 bremersee:
   user-listener:
+    hystrix-enabled: false
+    ribbon-enabled: false
     http-listeners:
     - feign-name: mailcow-connector
       feign-url: http://localhost:8091

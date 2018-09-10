@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bremersee.authman.business.RoleService;
 import org.bremersee.authman.business.SambaConnectorService;
 import org.bremersee.authman.business.UserProfileService;
+import org.bremersee.authman.controller.AbstractController;
 import org.bremersee.authman.controller.RedirectMessage;
 import org.bremersee.authman.controller.RedirectMessageType;
 import org.bremersee.authman.exception.EmailAlreadyExistsException;
@@ -141,6 +142,8 @@ public class UserProfileAddController extends AbstractUserProfileChangeControlle
     try {
       if (!user.isSambaActivated()) {
         user.setSambaSettings(null);
+      } else {
+        user.getSambaSettings().setSambaGroups(urlDecode(user.getSambaSettings().getSambaGroups()));
       }
       final UserProfileDto dto = userProfileService.createUserProfile(
           user,

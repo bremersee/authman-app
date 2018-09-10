@@ -30,6 +30,7 @@ import org.bremersee.authman.business.OAuth2ForeignTokenService;
 import org.bremersee.authman.business.RoleService;
 import org.bremersee.authman.business.SambaConnectorService;
 import org.bremersee.authman.business.UserProfileService;
+import org.bremersee.authman.controller.AbstractController;
 import org.bremersee.authman.controller.RedirectMessage;
 import org.bremersee.authman.controller.RedirectMessageType;
 import org.bremersee.authman.exception.EmailAlreadyExistsException;
@@ -181,7 +182,8 @@ public class UserProfileEditController extends AbstractUserProfileChangeControll
       sambaGroups = userProfile.getSambaSettings()
           .getSambaGroups()
           .stream()
-          .map(this::normalizeDistinguishedName)
+          .map(AbstractController::normalizeDistinguishedName)
+          .map(AbstractController::urlEncode)
           .collect(Collectors.toSet());
     } else {
       sambaGroups = new HashSet<>();
@@ -195,7 +197,7 @@ public class UserProfileEditController extends AbstractUserProfileChangeControll
         .map(option -> new SelectOptionDto(
             option.getValue(),
             option.getDisplayValue(),
-            sambaGroups.contains(normalizeDistinguishedName(option.getValue()))))
+            sambaGroups.contains(option.getValue())))
         .collect(Collectors.toList());
   }
 
@@ -228,15 +230,7 @@ public class UserProfileEditController extends AbstractUserProfileChangeControll
       if (!user.isSambaActivated()) {
         user.setSambaSettings(null);
       } else {
-        final List<String> decodedGroupList = user.getSambaSettings()
-            .getSambaGroups()
-            .stream()
-            .map(this::urlDecode)
-            .collect(Collectors.toList());
-        if (log.isDebugEnabled()) {
-          log.debug("Decoded samba groups: {}", decodedGroupList);
-        }
-        user.getSambaSettings().setSambaGroups(decodedGroupList);
+        user.getSambaSettings().setSambaGroups(urlDecode(user.getSambaSettings().getSambaGroups()));
       }
       final UserProfileDto dto = userProfileService.updateUserProfile(user.getUserName(), user);
 

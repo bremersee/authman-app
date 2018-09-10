@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -36,6 +37,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.bremersee.authman.model.SelectOptionDto;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -47,6 +49,7 @@ import org.springframework.web.servlet.LocaleResolver;
 /**
  * @author Christian Bremer
  */
+@Slf4j
 public abstract class AbstractController implements MessageSourceAware {
 
   private static final int localesSize = Locale.getAvailableLocales().length;
@@ -175,7 +178,7 @@ public abstract class AbstractController implements MessageSourceAware {
     return options;
   }
 
-  protected String urlEncode(final String value) {
+  protected static String urlEncode(final String value) {
     if (value == null) {
       return "";
     }
@@ -187,7 +190,7 @@ public abstract class AbstractController implements MessageSourceAware {
     }
   }
 
-  protected String urlDecode(final String value) {
+  protected static String urlDecode(final String value) {
     if (value == null) {
       return "";
     }
@@ -199,7 +202,19 @@ public abstract class AbstractController implements MessageSourceAware {
     }
   }
 
-  protected String normalizeDistinguishedName(final String dn) {
+  @SuppressWarnings("WeakerAccess")
+  protected static List<String> urlDecode(final List<String> encodedValues) {
+    final List<String> decodedValues = encodedValues
+        .stream()
+        .map(AbstractController::urlDecode)
+        .collect(Collectors.toList());
+    if (log.isDebugEnabled()) {
+      log.debug("Decoded values: {}", decodedValues);
+    }
+    return decodedValues;
+  }
+
+  protected static String normalizeDistinguishedName(final String dn) {
     if (!StringUtils.hasText(dn)) {
       return "";
     }

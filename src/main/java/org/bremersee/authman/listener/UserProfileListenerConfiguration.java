@@ -18,6 +18,7 @@ package org.bremersee.authman.listener;
 
 import feign.Client;
 import feign.Contract;
+import feign.Feign;
 import feign.Request;
 import feign.Retryer;
 import feign.Retryer.Default;
@@ -86,6 +87,7 @@ public class UserProfileListenerConfiguration {
       final OAuth2ClientRepository clientRepository) {
 
     this.properties = properties;
+    //this.discoveryClient = discoveryClient.getIfAvailable();
     this.contract = contract;
     this.client = client;
     this.decoder = decoder;
@@ -134,50 +136,54 @@ public class UserProfileListenerConfiguration {
       target = new Target.HardCodedTarget<>(UserProfileListenerApi.class,
           properties.getFeignUrl());
     } else if (StringUtils.hasText(properties.getFeignName())) {
-      target = Target.EmptyTarget.create(UserProfileListenerApi.class,
-          properties.getFeignName());
+      final String name = properties.getFeignName();
+      final boolean isUrl = name.startsWith("http://") || name.startsWith("https://");
+      if (!isUrl) {
+        log.warn("msg=[Adding scheme (http) to listener name.] name=[{}]", name);
+      }
+      target = new Target.HardCodedTarget<>(UserProfileListenerApi.class,
+          isUrl ? name : "http://" + name);
     } else {
       throw new IllegalArgumentException("Feign name and/or url must be present.");
     }
 
-    /*
-    return Feign
-        .builder()
-        .contract(contract)
-        .client(client(properties))
-        .options(new Request.Options(
-            properties.getConnectTimeoutMillis(),
-            properties.getReadTimeoutMillis()))
-        .decoder(decoder)
-        .encoder(encoder)
-        .errorDecoder(errorDecoder)
-        .logger(loggerFactory.create(UserProfileListenerApi.class))
-        .logLevel(properties.getFeignLoggerLevel())
-        .requestInterceptor(new OAuth2FeignRequestInterceptor(tokenProvider))
-        .retryer(retryer)
-        .target(target);
-    */
-
-    return HystrixFeign
-        .builder()
-        .contract(contract)
-        .client(client(properties))
-        .options(new Request.Options(
-            properties.getConnectTimeoutMillis(),
-            properties.getReadTimeoutMillis()))
-        .decoder(decoder)
-        .encoder(encoder)
-        .errorDecoder(errorDecoder)
-        .logger(loggerFactory.create(UserProfileListenerApi.class))
-        .logLevel(properties.getFeignLoggerLevel())
-        .requestInterceptor(new OAuth2FeignRequestInterceptor(tokenProvider))
-        .retryer(retryer)
-        //.target(target);
-        .target(target, fallback);
+    if (properties.isHystrixEnabled(this.properties)) {
+      return HystrixFeign
+          .builder()
+          .contract(contract)
+          .client(client(properties.isRibbonEnabled(this.properties)))
+          .options(new Request.Options(
+              properties.getConnectTimeoutMillis(),
+              properties.getReadTimeoutMillis()))
+          .decoder(decoder)
+          .encoder(encoder)
+          .errorDecoder(errorDecoder)
+          .logger(loggerFactory.create(UserProfileListenerApi.class))
+          .logLevel(properties.getFeignLoggerLevel())
+          .requestInterceptor(new OAuth2FeignRequestInterceptor(tokenProvider))
+          .retryer(retryer)
+          .target(target, fallback);
+    } else {
+      return Feign
+          .builder()
+          .contract(contract)
+          .client(client(properties.isRibbonEnabled(this.properties)))
+          .options(new Request.Options(
+              properties.getConnectTimeoutMillis(),
+              properties.getReadTimeoutMillis()))
+          .decoder(decoder)
+          .encoder(encoder)
+          .errorDecoder(errorDecoder)
+          .logger(loggerFactory.create(UserProfileListenerApi.class))
+          .logLevel(properties.getFeignLoggerLevel())
+          .requestInterceptor(new OAuth2FeignRequestInterceptor(tokenProvider))
+          .retryer(retryer)
+          .target(target);
+    }
   }
 
-  private Client client(final UserProfileHttpListenerProperties properties) {
-    if (StringUtils.hasText(properties.getFeignUrl())) {
+  private Client client(final boolean ribbonEnabled) {
+    if (!ribbonEnabled) {
       return new Client.Default(null, null);
     }
     return client;

@@ -19,6 +19,7 @@ package org.bremersee.authman.controller.admin;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.bremersee.authman.business.SambaConnectorService;
 import org.bremersee.authman.controller.AbstractController;
 import org.bremersee.authman.model.SelectOptionDto;
@@ -28,6 +29,7 @@ import org.springframework.web.servlet.LocaleResolver;
 /**
  * @author Christian Bremer
  */
+@Slf4j
 public class AbstractUserProfileChangeController extends AbstractController {
 
   private static final Object SAMBA_GROUPS_LOCK = new Object();
@@ -59,7 +61,7 @@ public class AbstractUserProfileChangeController extends AbstractController {
         sambaGroups = groups
             .stream()
             .map(sambaGroupItem -> new SelectOptionDto(
-                sambaGroupItem.getDistinguishedName(),
+                urlEncode(normalizeDistinguishedName(sambaGroupItem.getDistinguishedName())),
                 sambaGroupItem.getName(),
                 false))
             .collect(Collectors.toList());
