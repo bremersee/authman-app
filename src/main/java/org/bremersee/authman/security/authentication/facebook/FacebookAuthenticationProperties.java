@@ -33,6 +33,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @EqualsAndHashCode(callSuper = true)
 public class FacebookAuthenticationProperties extends OAuth2AuthenticationProperties {
 
+  private String apiVersion = "v3.1";
+
   // https://developers.facebook.com/docs/graph-api/reference/user/picture/
   private String picturePathTemplate = "/{userId}/picture?access_token={accessToken}"; // NOSONAR
 
@@ -40,19 +42,19 @@ public class FacebookAuthenticationProperties extends OAuth2AuthenticationProper
     super.setProvider("facebook");
     super.setScopeSeparator(",");
 
-    super.setLoginUrlTemplate("https://www.facebook.com/v2.8/dialog/oauth"
+    super.setLoginUrlTemplate("https://www.facebook.com/v3.1/dialog/oauth"
         + "?client_id={clientId}"
         + "&redirect_uri={redirectUri}"
         + "&response_type={responseType}"
         + "&scope={scope}&state={state}");
     super.setResponseType("code");
     super.setScope("public_profile,email");
-    super.setTokenUrlTemplate("https://graph.facebook.com/v2.8/oauth/access_token"
+    super.setTokenUrlTemplate("https://graph.facebook.com/v3.1/oauth/access_token"
         + "?client_id={clientId}"
         + "&redirect_uri={redirectUri}"
         + "&client_secret={clientSecret}"
         + "&code={code}");
-    super.setApiBaseUrl("https://graph.facebook.com/v2.8");
+    super.setApiBaseUrl("https://graph.facebook.com/v3.1");
     super.setProfilePathTemplate("/me"
         + "?access_token={accessToken}"
         + "&fields=id,name,gender,first_name,middle_name,last_name,name_format,email,locale,"

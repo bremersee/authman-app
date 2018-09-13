@@ -52,8 +52,9 @@ bremersee:
   oauth2:
     facebook:
       provider: facebook
+      api-version: v3.1
       login-url-template: "\
-        https://www.facebook.com/v2.8/dialog/oauth\
+        https://www.facebook.com/${bremersee.oauth2.facebook.api-version}/dialog/oauth\
         ?client_id={clientId}\
         &redirect_uri={redirectUri}\
         &response_type={responseType}\
@@ -66,14 +67,15 @@ bremersee:
       response-type: code
       scope: public_profile,email
       token-url-template: "\
-        https://graph.facebook.com/v2.8/oauth/access_token\
+        https://graph.facebook.com/${bremersee.oauth2.facebook.api-version}/oauth/access_token\
         ?client_id={clientId}\
         &redirect_uri={redirectUri}\
         &client_secret={clientSecret}\
         &code={code}"
-      api-base-url: https://graph.facebook.com/v2.8
+      api-base-url: https://graph.facebook.com/${bremersee.oauth2.facebook.api-version}
       profile-path-template: "/me?access_token={accessToken}\
-        &fields=id,name,gender,first_name,middle_name,last_name,name_format,email,locale,timezone,verified,website"
+        &fields=id,name,gender,first_name,middle_name,last_name,name_format,email,locale,\
+        timezone,verified,website"
     github:
       provider: github
       login-url-template: "\
