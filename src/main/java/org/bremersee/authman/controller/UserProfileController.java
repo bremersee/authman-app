@@ -17,6 +17,7 @@
 package org.bremersee.authman.controller;
 
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.authman.business.OAuth2ForeignTokenService;
@@ -32,6 +33,8 @@ import org.bremersee.authman.security.core.SecurityHelper;
 import org.bremersee.authman.validation.ValidationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
@@ -40,6 +43,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -47,6 +51,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * @author Christian Bremer
  */
 @Controller("userProfileController")
+@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @RequestMapping("/profile")
 @EnableConfigurationProperties({
     FacebookAuthenticationProperties.class,
@@ -68,6 +73,12 @@ public class UserProfileController extends AbstractController {
 
   private final OAuth2ForeignTokenService foreignTokenService;
 
+  private boolean gitHubConnected = false;
+
+  private boolean googleConnected = false;
+
+  private boolean facebookConnected = false;
+
   @Autowired
   public UserProfileController(
       final ValidationProperties validationProperties,
@@ -85,6 +96,16 @@ public class UserProfileController extends AbstractController {
     this.googleProperties = googleProperties;
     this.userService = userService;
     this.foreignTokenService = foreignTokenService;
+  }
+
+  @PostConstruct
+  public void init() {
+    gitHubConnected = foreignTokenService.isAccountConnected(
+        SecurityHelper.getCurrentUserName(), gitHubProperties.getProvider());
+    googleConnected = foreignTokenService.isAccountConnected(
+        SecurityHelper.getCurrentUserName(), googleProperties.getProvider());
+    facebookConnected = foreignTokenService.isAccountConnected(
+        SecurityHelper.getCurrentUserName(), facebookProperties.getProvider());
   }
 
   @ModelAttribute("userNamePattern")
@@ -121,20 +142,17 @@ public class UserProfileController extends AbstractController {
 
   @ModelAttribute("gitHubConnected")
   public boolean gitHubConnected() {
-    return foreignTokenService.isAccountConnected(
-        SecurityHelper.getCurrentUserName(), gitHubProperties.getProvider());
+    return gitHubConnected;
   }
 
   @ModelAttribute("googleConnected")
   public boolean googleConnected() {
-    return foreignTokenService.isAccountConnected(
-        SecurityHelper.getCurrentUserName(), googleProperties.getProvider());
+    return googleConnected;
   }
 
   @ModelAttribute("facebookConnected")
   public boolean facebookConnected() {
-    return foreignTokenService.isAccountConnected(
-        SecurityHelper.getCurrentUserName(), facebookProperties.getProvider());
+    return facebookConnected;
   }
 
   @GetMapping

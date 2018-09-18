@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       lang="en">
 <head>
   <meta charset="UTF-8">
@@ -50,6 +49,24 @@
     </div>
 
     <div>
+      <form th:if="${facebookConnected}"
+            id="disconnect-facebook"
+            th:method="post"
+            th:action="@{profile/oauth2-disconnect(provider=facebook)}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+      </form>
+      <form th:if="${gitHubConnected}"
+            id="disconnect-github"
+            th:method="post"
+            th:action="@{profile/oauth2-disconnect(provider=github)}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+      </form>
+      <form th:if="${googleConnected}"
+            id="disconnect-google"
+            th:method="post"
+            th:action="@{profile/oauth2-disconnect(provider=google)}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+      </form>
       <form th:action="@{profile}" th:object="${profile}" action="#" method="post">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
@@ -159,17 +176,31 @@
               <input id="github" type="checkbox" class="form-check-input"
                      disabled th:checked="${gitHubConnected}" />
               <label for="github"><i class="fa fa-github left"></i> GitHub</label>
-              <a href="#" th:href="@{profile/oauth2-connect(provider=github)}">Connect account</a>
+              <a href="#" th:href="@{profile/oauth2-connect(provider=github)}"
+                 th:if="${not gitHubConnected}">Connect account</a>
+              <a href="#" id="disconnect-github-link"
+                 onclick="document.getElementById('disconnect-github').submit();"
+                 th:if="${gitHubConnected}">Disconnect account</a>
             </div>
             <div class="form-check">
               <input id="google" type="checkbox" class="form-check-input"
                      disabled th:checked="${googleConnected}" />
               <label for="google"><i class="fa fa-google left"></i> Google</label>
+              <a href="#" th:href="@{profile/oauth2-connect(provider=google)}"
+                 th:if="${not googleConnected}">Connect account</a>
+              <a href="#" id="disconnect-google-link"
+                 onclick="document.getElementById('disconnect-google').submit();"
+                 th:if="${googleConnected}">Disconnect account</a>
             </div>
             <div class="form-check">
               <input id="facebook" type="checkbox" class="form-check-input"
                      disabled th:checked="${facebookConnected}" />
               <label for="facebook"><i class="fa fa-facebook left"></i> Facebook</label>
+              <a href="#" th:href="@{profile/oauth2-connect(provider=facebook)}"
+                 th:if="${not facebookConnected}">Connect account</a>
+              <a href="#" id="disconnect-facebook-link"
+                 onclick="document.getElementById('disconnect-facebook').submit();"
+                 th:if="${facebookConnected}">Disconnect account</a>
             </div>
           </div>
         </div>
@@ -184,4 +215,9 @@
   </div>
 </main>
 </body>
+<script type="text/javascript" th:inline="javascript">
+  //<![CDATA[
+  'use strict';
+  //]]>
+</script>
 </html>
