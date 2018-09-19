@@ -80,7 +80,7 @@ public class NameServerController extends AbstractController {
               new NameServerEntry(
                   dnsZone,
                   sambaConnectorService.getDnsRecords(dnsZone.getPszZoneName()))));
-      Collections.sort(entries);
+      //Collections.sort(entries);
       model.addAttribute("entries", entries);
     }
     if (!model.containsAttribute("newZone")) {
