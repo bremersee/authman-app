@@ -19,6 +19,7 @@ package org.bremersee.authman;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.common.exhandling.ApiExceptionMapper;
 import org.bremersee.common.exhandling.ApiExceptionMapperImpl;
@@ -26,8 +27,10 @@ import org.bremersee.common.exhandling.ApiExceptionResolver;
 import org.bremersee.common.exhandling.ApiExceptionResolverProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -42,16 +45,24 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
  * @author Christian Bremer
  */
 @Configuration
-@EnableConfigurationProperties({ApiExceptionResolverProperties.class})
+@EnableConfigurationProperties({
+    ApiExceptionResolverProperties.class,
+    MessageSourceProperties.class
+})
 @Slf4j
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
+  private static final String DEFAULT_MESSAGES_BASE_NAME = "classpath:messages";
+
   private final ApiExceptionResolver apiExceptionResolver;
+
+  private final MessageSourceProperties messageSourceProperties;
 
   @Autowired
   public WebMvcConfiguration(
       final Environment env,
       final ApiExceptionResolverProperties apiExceptionResolverProperties,
+      final MessageSourceProperties messageSourceProperties,
       final Jackson2ObjectMapperBuilder objectMapperBuilder) {
 
     final ApiExceptionMapper apiExceptionMapper = new ApiExceptionMapperImpl(
@@ -62,6 +73,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         apiExceptionResolverProperties,
         apiExceptionMapper);
     this.apiExceptionResolver.setObjectMapperBuilder(objectMapperBuilder);
+    this.messageSourceProperties = messageSourceProperties;
   }
 
   @Bean
@@ -143,6 +155,31 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
   @Override
   public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
     exceptionResolvers.add(0, apiExceptionResolver);
+  }
+
+  @Bean
+  public MessageSource messageSource() {
+    final ReloadableResourceBundleMessageSource messageSource
+        = new ReloadableResourceBundleMessageSource();
+    //messageSource.setBasenames("file:/Users/cbr/messages", "classpath:messages");
+    final List<String> baseNames = new ArrayList<>(messageSourceProperties.getBaseNames());
+    if (!baseNames.contains(DEFAULT_MESSAGES_BASE_NAME)) {
+      baseNames.add(DEFAULT_MESSAGES_BASE_NAME);
+    }
+    messageSource.setBasenames(baseNames.toArray(new String[0]));
+    if (baseNames.size() > 1 && messageSourceProperties.getCacheSeconds() > 0) {
+      messageSource.setCacheSeconds(messageSourceProperties.getCacheSeconds());
+    }
+    messageSource.setDefaultEncoding(messageSourceProperties.getDefaultEncoding());
+    if (!messageSourceProperties.getFileEncodings().isEmpty()) {
+      final Properties fileEncodings = new Properties();
+      fileEncodings.putAll(messageSourceProperties.getFileEncodings());
+      messageSource.setFileEncodings(fileEncodings);
+    }
+    messageSource.setConcurrentRefresh(messageSourceProperties.isConcurrentRefresh());
+    messageSource.setFallbackToSystemLocale(messageSourceProperties.isFallbackToSystemLocale());
+    messageSource.setUseCodeAsDefaultMessage(messageSourceProperties.isUseCodeAsDefaultMessage());
+    return messageSource;
   }
 
 }
